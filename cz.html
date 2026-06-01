@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Solar System</title>
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/u/0/d/1kzTPZXfSrW2KfinhE5SzhRiTHAhZF7OG">
+    <style>
+        body {
+            background-color: #000;
+            margin: 0;
+            color: #fff;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: auto;
+        }
+
+        #overlay {
+            background-color: rgba(0, 0, 0, 0.9);
+            transition: opacity 0.9s ease;
+        }
+
+        .main-title {
+            color: bisque;
+            font-family: 'Baskerville', 'Libre Baskerville', 'Times New Roman', serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 22px 0px 12px 0px;
+            margin: 0;
+            font-size: 1.7rem;
+            text-align: center;
+        }
+
+        .main-subtitle {
+            color: rgb(255, 255, 255);
+            font-family: 'Baskerville', 'Libre Baskerville', 'Times New Roman', serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding-bottom: 40px;
+            margin: 0;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        .image-container {
+            position: relative;
+            display: block;
+            width: fit-content;
+            margin: 20px auto;
+            overscroll-behavior: contain;
+            touch-action: pan-x pan-y;
+        }
+
+        .image-container img {
+            width: 90vw;
+            max-width: none;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .hotspot {
+            position: absolute;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0);
+        }
+
+        .hotspot:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* BOOKMARK: CSS */
+
+        .tooltip {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #222;
+            color: #ddd;
+            border: 1px solid #444;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            width: 95vw;
+            max-width: 450px;
+            max-height: 85vh;
+            max-height: 85dvh;
+            padding: 5px;
+            overflow: hidden;
+            z-index: 9999;
+            flex-direction: column;
+        }
+
+        .tooltip-content {
+            padding: 12px 12px 24px 12px;
+            text-align: center;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .tooltip-footer {
+            padding: 10px 20px;
+            text-align: right;
+            border-top: 1px solid #444;
+            background-color: #222;
+            flex-shrink: 0;
+        }
+
+        #close-btn {
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            padding: 5px 14px;
+            border-radius: 6px;
+            line-height: 1;
+        }
+
+        #scroll-wrapper {
+            width: 100%;
+            padding-bottom: 40px;
+        }
+
+        #fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            text-align: center;
+        }
+
+        .tooltip h3 {
+            margin: 0 0 10px;
+            color: #fff;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .tooltip p {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .tooltip b {
+            color: bisque;
+        }
+
+        .tooltip a {
+            color: #58a6ff;
+            text-decoration: none;
+            display: inline;
+            margin-top: 0;
+        }
+
+        .tooltip p a:last-child {
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+
+            html,
+            body {
+                overflow-x: scroll;
+                scroll-snap-type: none;
+                align-items: flex-start;
+            }
+
+            #fixed-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                background-color: rgba(0, 0, 0, 0.9);
+                z-index: 1000;
+                text-align: center;
+            }
+
+            #scroll-wrapper {
+                width: 200vw;
+                margin-left: 0;
+
+            }
+
+            .main-title {
+                font-size: 1.1rem;
+                text-align: center;
+                width: 100vw;
+            }
+
+            .main-subtitle {
+                font-size: 0.65rem;
+                width: 100vw;
+                text-align: center;
+            }
+
+            .image-container {
+                display: inline-block;
+                position: relative;
+                margin: 0;
+                width: 200vw;
+            }
+
+            .image-container img {
+                width: 200vw;
+                max-width: none;
+                margin: 0;
+                display: block;
+
+            }
+
+            .tooltip {
+                top: 32%;
+                max-height: 85dvh;
+                max-height: 85vh;
+            }
+        }
+
+        /* BOOKMARK: Hotspots */
+        #body {
+            top: 0.5%;
+            left: 7%;
+            width: 7%;
+            height: 3%;
+        }
+
+        #moons {
+            top: 0.5%;
+            left: 36.5%;
+            width: 8%;
+            height: 3%;
+        }
+
+        #au {
+            top: 7.5%;
+            left: 1%;
+            width: 2.5%;
+            height: 3%;
+        }
+
+        #kuiper {
+            top: 8%;
+            left: 6%;
+            width: 20%;
+            height: 7.5%;
+        }
+
+        #neptune {
+            top: 17%;
+            left: 6%;
+            width: 20%;
+            height: 5%;
+        }
+
+        #uranus {
+            top: 24%;
+            left: 6%;
+            width: 20%;
+            height: 4.5%;
+        }
+
+        #saturn {
+            top: 31%;
+            left: 6%;
+            width: 20%;
+            height: 7%;
+        }
+
+        #jupiter {
+            top: 40%;
+            left: 6%;
+            width: 20%;
+            height: 8.5%;
+        }
+
+        #asteroid-belt {
+            top: 52.5%;
+            left: 6%;
+            width: 20%;
+            height: 6%;
+        }
+
+        #mars {
+            top: 59.5%;
+            left: 6%;
+            width: 20%;
+            height: 4.5%;
+        }
+
+        #earth {
+            top: 65%;
+            left: 6%;
+            width: 20%;
+            height: 5%;
+        }
+
+        #venus {
+            top: 71.5%;
+            left: 6%;
+            width: 20%;
+            height: 5%;
+        }
+
+        #mercury {
+            top: 77.5%;
+            left: 6%;
+            width: 20%;
+            height: 4%;
+        }
+
+        #sun {
+            top: 83%;
+            left: 6%;
+            width: 20%;
+            height: 8%;
+        }
+
+        #pluto {
+            top: 8%;
+            left: 28.5%;
+            width: 14%;
+            height: 3.5%;
+        }
+
+        #eris {
+            top: 8%;
+            left: 43.5%;
+            width: 15%;
+            height: 3.5%;
+        }
+
+        #makemake {
+            top: 8%;
+            left: 59%;
+            width: 11%;
+            height: 3.5%;
+        }
+
+        #haumea {
+            top: 8%;
+            left: 70.5%;
+            width: 24%;
+            height: 3.5%;
+        }
+
+        #quaoar {
+            top: 12%;
+            left: 28.5%;
+            width: 16%;
+            height: 3.5%;
+        }
+
+        #orcus {
+            top: 12%;
+            left: 45.5%;
+            width: 13%;
+            height: 3.5%;
+        }
+
+        #sedna {
+            top: 12%;
+            left: 59.5%;
+            width: 7%;
+            height: 3.5%;
+        }
+
+        #triton {
+            top: 18%;
+            left: 28.5%;
+            width: 7.5%;
+            height: 3.5%;
+        }
+
+        #proteus {
+            top: 18%;
+            left: 36.5%;
+            width: 8%;
+            height: 3.5%;
+        }
+
+        #nereid {
+            top: 18%;
+            left: 45.5%;
+            width: 7%;
+            height: 3.5%;
+        }
+
+        #larissa {
+            top: 18%;
+            left: 54%;
+            width: 7%;
+            height: 3.5%;
+        }
+
+        #galatea {
+            top: 18%;
+            left: 62%;
+            width: 9%;
+            height: 3.5%;
+        }
+
+        #despina {
+            top: 18%;
+            left: 71.5%;
+            width: 8%;
+            height: 3.5%;
+        }
+
+        #thalassa {
+            top: 18%;
+            left: 80.5%;
+            width: 9%;
+            height: 3.5%;
+        }
+
+        #naiad {
+            top: 18%;
+            left: 90.5%;
+            width: 7%;
+            height: 3.5%;
+        }
+
+        #titania {
+            top: 24%;
+            left: 28.5%;
+            width: 7.5%;
+            height: 3.5%;
+        }
+
+        #oberon {
+            top: 24%;
+            left: 37%;
+            width: 7.5%;
+            height: 3.5%;
+        }
+
+        #umbriel {
+            top: 24%;
+            left: 45%;
+            width: 8%;
+            height: 3.5%;
+        }
+
+        #ariel {
+            top: 24%;
+            left: 53.5%;
+            width: 6%;
+            height: 3.5%;
+        }
+
+        #miranda {
+            top: 24%;
+            left: 60%;
+            width: 8%;
+            height: 3.5%;
+        }
+
+        #puck {
+            top: 24%;
+            left: 69%;
+            width: 5.5%;
+            height: 3.5%;
+        }
+
+        #caliban {
+            top: 24%;
+            left: 75.5%;
+            width: 7.5%;
+            height: 3.5%;
+        }
+
+        #sycorax {
+            top: 24%;
+            left: 83.5%;
+            width: 8%;
+            height: 3.5%;
+        }
+
+        #titan {
+            top: 30%;
+            left: 28.5%;
+            width: 6%;
+            height: 3.5%;
+        }
+
+        #rhea {
+            top: 30%;
+            left: 35.5%;
+            width: 5.5%;
+            height: 3.5%;
+        }
+
+        #iapetus {
+            top: 30%;
+            left: 41.5%;
+            width: 7.5%;
+            height: 3.5%;
+        }
+
+        #dione {
+            top: 30%;
+            left: 50%;
+            width: 6%;
+            height: 3.5%;
+        }
+
+        #tethys {
+            top: 30%;
+            left: 56.5%;
+            width: 7%;
+            height: 3.5%;
+        }
+
+        #enceladus {
+            top: 30%;
+            left: 64%;
+            width: 10%;
+            height: 3.5%;
+        }
+
+        #mimas {
+            top: 30%;
+            left: 75%;
+            width: 6%;
+            height: 3.5%;
+        }
+
+        #hyperion {
+            top: 30%;
+            left: 81.5%;
+            width: 9%;
+            height: 3.5%;
+        }
+
+        #phoebe {
+            top: 34%;
+            left: 28.5%;
+            width: 7%;
+            height: 3.5%;
+        }
+
+        #janus {
+            top: 34%;
+            left: 36.5%;
+            width: 7%;
+            height: 3.5%;
+        }
+
+        #ganymede {
+            top: 40%;
+            left: 28.5%;
+            width: 10%;
+            height: 3.5%;
+        }
+
+        #callisto {
+            top: 40%;
+            left: 39%;
+            width: 8%;
+            height: 3.5%;
+        }
+
+        #io {
+            top: 40%;
+            left: 47.5%;
+            width: 3%;
+            height: 3.5%;
+        }
+
+        #europa {
+            top: 40%;
+            left: 51%;
+            width: 7.5%;
+            height: 3.5%;
+        }
+
+        #amalthea {
+            top: 40%;
+            left: 59%;
+            width: 9%;
+            height: 3.5%;
+        }
+
+        #himalia {
+            top: 40%;
+            left: 68.5%;
+            width: 7.5%;
+            height: 3.5%;
+        }
+
+        #thebe {
+            top: 40%;
+            left: 76.5%;
+            width: 6.5%;
+            height: 3.5%;
+        }
+
+        #elara {
+            top: 40%;
+            left: 83.5%;
+            width: 6%;
+            height: 3.5%;
+        }
+
+        #metis {
+            top: 40%;
+            left: 90%;
+            width: 6%;
+            height: 3.5%;
+        }
+
+        #adrastea {
+            top: 44.5%;
+            left: 28.5%;
+            width: 9%;
+            height: 3.5%;
+        }
+
+        #ceres {
+            top: 54%;
+            left: 28.5%;
+            width: 17.5%;
+            height: 3.5%;
+        }
+
+        #vesta {
+            top: 54%;
+            left: 46.5%;
+            width: 6%;
+            height: 3.5%;
+        }
+
+        #pallas {
+            top: 54%;
+            left: 53.5%;
+            width: 6%;
+            height: 3.5%;
+        }
+
+        #hygiea {
+            top: 54%;
+            left: 60%;
+            width: 7%;
+            height: 3.5%;
+        }
+
+        #phobos {
+            top: 60%;
+            left: 28.5%;
+            width: 7.5%;
+            height: 3.5%;
+        }
+
+        #deimos {
+            top: 60%;
+            left: 36.5%;
+            width: 7.5%;
+            height: 3.5%;
+        }
+
+        #themoon {
+            top: 66%;
+            left: 28.5%;
+            width: 9.5%;
+            height: 3.5%;
+        }
+
+        #system {
+            top: 84%;
+            left: 28.5%;
+            width: 64%;
+            height: 3%;
+        }
+
+        #about {
+            top: 97%;
+            left: 7.5%;
+            width: 7%;
+            height: 2%;
+        }
+
+        #projects {
+            top: 97%;
+            left: 40%;
+            width: 20%;
+            height: 2%;
+        }
+
+        #language {
+            top: 97%;
+            left: 87.5%;
+            width: 6%;
+            height: 2%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- BOOKMARK: Text  -->
+    <div id="fixed-header">
+        <h1 class="main-title">The Solar System</h1>
+        <p class="main-subtitle">A Field Guide to Our Cosmic Neighbourhood<br><br>Tap to explore</p>
+    </div>
+    <div id="header-spacer"></div>
+    <div id="scroll-wrapper">
+        <div class="image-container">
+            <img src="https://lh3.googleusercontent.com/u/0/d/1NJF42Hosq905z8-KeJTVs6ITqo1R7nhi" alt="Geologic Time Scale">
+
+            <div class="hotspot" id="body" data-title="Astronomical object" data-desc="<br>A naturally occurring physical entity, association, or structure that exists within the universe. In astronomy, the terms object and body are often used interchangeably. However, an astronomical body, celestial body, or heavenly body is a single, tightly bound, contiguous physical object, while an astronomical or celestial object admits a more complex, less cohesively bound structure, which may consist of multiple bodies or even other objects with substructures.<br><br><a href='https://en.wikipedia.org/wiki/Astronomical_object' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="moons" data-title="Natural satellites" data-desc="<br>A natural satellite is, in the most common usage, an astronomical body that orbits a planet, dwarf planet, or small Solar System body (or sometimes another natural satellite). Natural satellites are colloquially referred to as moons, by analogy with the Moon, Earth's natural satellite, classically also known as Selene or Luna. In English, the Moon with a capital M denotes Earth's satellite, while moon with a lowercase m is used generically for natural satellites.<br><br>In the Solar System, there are six planetary satellite systems, altogether comprising 455 natural satellites with confirmed orbits. Seven objects commonly considered dwarf planets by astronomers are also known to have natural satellites: Orcus, Pluto, Haumea, Quaoar, Makemake, Gonggong, and Eris. Including the aforementioned seven, there are 625 minor planets known to have natural satellites.<br><br><a href='https://en.wikipedia.org/wiki/Astronomical_object' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="au" data-title="Astronomical unit" data-desc="<br>A unit of length defined as 149597870700 m. Historically, the astronomical unit was conceived as the average Earth-Sun distance (the average of Earth's aphelion and perihelion), before its modern redefinition in 2012.<br><br>The astronomical unit is used primarily for measuring distances within the Solar System or around other stars. It is also a fundamental component in the definition of another unit of astronomical length, the parsec. One au is approximately equivalent to 499 light-seconds.<br><br><a href='https://en.wikipedia.org/wiki/Astronomical_unit' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="kuiper" data-title="Kuiper Belt" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Kuiper_belt_plot_objects_of_outer_solar_system.png/960px-Kuiper_belt_plot_objects_of_outer_solar_system.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A vast region of the outer Solar System beyond Neptune's orbit, populated by hundreds of thousands of icy bodies, dwarf planets, and frozen remnants from the Solar System's formation 4.6 billion years ago.<br><br><b>Distance from the Sun:</b> Extends from roughly 30 AU to 50 AU - approximately 4.5 to 7.5 billion kilometres from the Sun. Some scattered objects like Sedna venture far beyond this range.<br><br><b>Size &amp; Mass:</b> A wide donut-shaped region spanning about 20 AU in width. Despite containing hundreds of thousands of icy bodies, its total mass is estimated at only around 0.04 Earth masses - remarkably thin by cosmic standards. <br><br><b>Composition:</b> Primarily frozen volatiles - water, ammonia, and methane - mixed with rock and dust. These so-called 'cold classical' objects are remnants left over from the formation of the Solar System about 4.6 billion years ago. <br><br><b>Notable Objects:</b> The most famous resident is Pluto, a dwarf planet with five moons, the largest being Charon. Eris is slightly more massive than Pluto despite being smaller in diameter. Sedna has an extraordinarily elongated orbit, taking roughly 11,000 years to complete one trip around the Sun.<br><br><b>Role in the Solar System:</b> The Kuiper Belt is the primary source of short-period comets - those with orbital periods under 200 years. Gravitational nudges from Neptune occasionally push objects inward, sending them on trajectories toward the inner Solar System.<br><br><a href='https://en.wikipedia.org/wiki/Kuiper_belt' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="neptune" data-title="Neptune" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Neptune_Voyager2_color_calibrated.png/960px-Neptune_Voyager2_color_calibrated.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The eighth and most distant planet from the Sun, a faintly blue ice giant with the most powerful winds recorded in the Solar System and a dynamic, storm-driven atmosphere.<br><br><b>Distance from the Sun:</b> Orbits at an average of 30.07 AU - approximately 4.5 billion kilometres from the Sun. At this distance, sunlight takes roughly four hours to reach it.<br><br><b>Orbital Period:</b> One Neptune year lasts approximately 165 Earth years. It completed its first full orbit since discovery in 2011, having been found in 1846.<br><br><b>Size:</b> Diameter of approximately 49,500 km - about 3.9 times wider than Earth. It is the smallest of the four giant planets but denser than Uranus, making it slightly more massive.<br><br><b>Composition:</b> Classed as an ice giant, its interior is thought to consist of water, ammonia, and methane ices surrounding a rocky core, topped by a hydrogen and helium atmosphere. The blue colour comes from methane absorbing red light.<br><br><b>Notable Features:</b> Neptune hosts the Great Dark Spot, a storm system comparable in scale to Earth, and wind speeds reaching up to 2,100 km/h - the fastest in the Solar System. Its largest moon, Triton, orbits backwards and is almost certainly a captured Kuiper Belt object.<br><br><a href='https://en.wikipedia.org/wiki/Neptune' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="uranus" data-title="Uranus" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/6/69/Uranus_Voyager2_color_calibrated.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The seventh planet from the Sun and an ice giant, most notable for its extreme axial tilt which causes it to rotate almost on its side relative to its orbit.<br><br><b>Distance from the Sun:</b> Orbits at an average of 19.19 AU - approximately 2.87 billion kilometres from the Sun. Sunlight takes about two hours and forty minutes to reach it.<br><br><b>Orbital Period:</b> One Uranus year lasts approximately 84 Earth years. Its extreme tilt of 97.77 degrees means each pole experiences around 42 years of continuous sunlight followed by 42 years of darkness.<br><br><b>Size:</b> Diameter of approximately 50,700 km - about four times wider than Earth. Despite being larger in volume than Neptune, it is less massive, making it the least dense of the giant planets.<br><br><b>Composition:</b> Like Neptune, classed as an ice giant with a mantle of water, ammonia, and methane ices around a rocky core. Its atmosphere is hydrogen and helium with trace methane, giving it a pale blue-green appearance - very similar in colour to Neptune when both are imaged under consistent conditions.<br><br><b>Notable Features:</b> Uranus has a system of 13 known rings (essentially invisible in most standard optical images) and 28 moons, most named after characters from Shakespeare and Alexander Pope. The cause of its dramatic tilt is thought to be a massive collision early in Solar System history.<br><br><a href='https://en.wikipedia.org/wiki/Uranus' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="saturn" data-title="Saturn" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Saturn_Storm.jpg/960px-Saturn_Storm.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The sixth planet from the Sun and the second largest in the Solar System, an ice giant most famous for its spectacular and easily visible ring system - the most extensive of any planet.<br><br><b>Distance from the Sun:</b> Orbits at an average of 9.58 AU - approximately 1.43 billion kilometres from the Sun. Sunlight takes just over an hour to reach it.<br><br><b>Orbital Period:</b> One Saturn year lasts approximately 29.5 Earth years. Its axial tilt of about 26.7 degrees gives it distinct seasons, and the rings appear at varying angles from Earth depending on where Saturn is in its orbit.<br><br><b>Size:</b> Diameter of approximately 116,460 km - about 9.5 times wider than Earth. Despite its enormous size, Saturn is the least dense planet in the Solar System, less dense than water, meaning it would theoretically float if placed in a large enough ocean.<br><br><b>Composition:</b> Classed as a gas giant, Saturn has no solid surface. It consists primarily of hydrogen and helium, with a possible rocky core. Its pale golden colour comes from ammonia crystals in the upper atmosphere.<br><br><b>Notable Features:</b> Saturn's ring system spans up to 282,000 km in diameter but is typically less than one kilometre thick. The rings are composed mostly of ice particles and rocky debris. Its moon Titan is the only moon in the Solar System with a dense atmosphere, and Enceladus erupts geysers of water ice from its southern pole, making it one of the strongest candidates for extraterrestrial life in the Solar System.<br><br><a href='https://en.wikipedia.org/wiki/Saturn' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="jupiter" data-title="Jupiter" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Jupiter_OPAL_2024.png/960px-Jupiter_OPAL_2024.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The fifth planet from the Sun and by far the largest in the Solar System, a gas giant so massive that it exerts a gravitational influence felt across the entire Solar System - including a role in shielding the inner planets from some cometary impacts.<br><br><b>Distance from the Sun:</b> Orbits at an average of 5.20 AU - approximately 778 million kilometres from the Sun. Sunlight takes about 43 minutes to reach it.<br><br><b>Orbital Period:</b> One Jupiter year lasts approximately 11.86 Earth years. Despite its enormous size, it rotates faster than any other planet, completing one day in just under 10 hours - fast enough to visibly flatten it at the poles.<br><br><b>Size:</b> Diameter of approximately 139,820 km - about 11 times wider than Earth. Its mass is greater than all other planets combined, more than twice over. It is however not massive enough to have ignited nuclear fusion, which would have made it a star.<br><br><b>Composition:</b> A gas giant with no solid surface, composed primarily of hydrogen and helium. Deeper layers are thought to contain metallic hydrogen - a form that conducts electricity - which drives Jupiter's powerful magnetic field, the strongest of any planet in the Solar System.<br><br><b>Notable Features:</b> The Great Red Spot is a storm system that has persisted for at least 350 years, though it has been shrinking in recent decades. Jupiter has at least 95 known moons, four of which - Io, Europa, Ganymede, and Callisto - were observed by Galileo in 1610. Europa is considered one of the most promising locations in the Solar System for the possible existence of life, owing to a suspected liquid water ocean beneath its icy surface.<br><br><a href='https://en.wikipedia.org/wiki/Jupiter' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="asteroid-belt" data-title="Asteroid Belt" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/8/89/243_ida_crop.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A region of the Solar System between the orbits of Mars and Jupiter containing a large concentration of irregularly shaped rocky and metallic bodies - the remnants of the early Solar System that never coalesced into a planet due to Jupiter's gravitational interference.<br><br><b>Distance from the Sun:</b> Spans roughly 2.2 to 3.2 AU - approximately 329 to 479 million kilometres from the Sun. Despite popular depictions, the belt is mostly empty space; spacecraft have passed through it with no difficulty.<br><br><b>Size &amp; Mass:</b> Contains an estimated 1.1 to 1.9 million asteroids larger than 1 kilometre in diameter, yet the total mass of the entire belt is only about 4% of the Moon's mass - far too little to have ever formed a planet even without Jupiter's influence.<br><br><b>Composition:</b> Asteroids vary considerably by type. Rocky silicate bodies dominate the inner belt, while darker carbon-rich bodies are more common in the outer belt. Metallic iron-nickel asteroids also exist and are thought to be remnants of shattered proto-planetary cores. Ceres, the only dwarf planet in the belt, contains a significant amount of ice and may have a thin water vapour atmosphere.<br><br><b>Notable Objects:</b> Ceres accounts for roughly 30% of the belt's total mass on its own. Vesta is the brightest asteroid visible from Earth and shows evidence of a differentiated interior - meaning it developed a core, mantle, and crust like a planet before being disrupted. Both have been visited by NASA's Dawn spacecraft.<br><br><b>Role in the Solar System:</b> The asteroid belt is a source of meteorites that regularly reach Earth, providing scientists with direct physical samples of early Solar System material. Some near-Earth asteroids are thought to have originated here, nudged inward by gravitational interactions with Jupiter.<br><br><a href='https://en.wikipedia.org/wiki/Asteroid_belt' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="mars" data-title="Mars" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png/960px-Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The fourth planet from the Sun and the outermost of the four terrestrial planets, a cold, dry, iron-oxide-rich world with the tallest volcano and the longest canyon system in the Solar System.<br><br><b>Distance from the Sun:</b> Orbits at an average of 1.52 AU - approximately 228 million kilometres from the Sun. Its orbit is notably elliptical, causing significant variation in solar energy received between perihelion and aphelion.<br><br><b>Orbital Period:</b> One Mars year lasts approximately 687 Earth days. Its axial tilt of 25.2 degrees is similar to Earth's 23.5 degrees, giving it recognisable seasons, though each season lasts roughly twice as long.<br><br><b>Size:</b> Diameter of approximately 6,779 km - about half of Earth's. Its lower gravity, roughly 38% of Earth's, means it was unable to retain a thick atmosphere over geological time.<br><br><b>Composition:</b> A rocky terrestrial planet with a thin atmosphere composed mostly of carbon dioxide. The surface is covered in iron oxide dust giving it its characteristic red appearance. Evidence of ancient river valleys, lake beds, and polar ice caps of water and carbon dioxide ice suggests a dramatically different past climate.<br><br><b>Notable Features:</b> Olympus Mons, at approximately 21.9 km in height, is the tallest known volcano in the Solar System. Valles Marineris stretches roughly 4,000 km across the surface - long enough to span the entire width of the United States. Mars currently hosts several active robotic missions including NASA's Perseverance rover, which is searching for signs of ancient microbial life.<br><br><a href='https://en.wikipedia.org/wiki/Mars' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="earth" data-title="Earth" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Meteosat-12-fci-march-equinox-2025-noon_%28cropped%29.jpg/960px-Meteosat-12-fci-march-equinox-2025-noon_%28cropped%29.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The third planet from the Sun and the largest of the four terrestrial planets, the only known body in the Universe confirmed to harbour life, and the current subject of your anthropological away mission, Crewman.<br><br><b>Distance from the Sun:</b> Orbits at an average of 1.00 AU - approximately 150 million kilometres from the Sun, a distance sometimes used as the very definition of one astronomical unit. Sunlight takes approximately 8 minutes and 20 seconds to reach it.<br><br><b>Orbital Period:</b> One Earth year lasts 365.25 days, the extra quarter day accounting for the leap year system. Its axial tilt of 23.5 degrees drives the four seasons experienced across much of the planet's surface.<br><br><b>Size:</b> Diameter of approximately 12,742 km. Earth is the densest planet in the Solar System, with a substantial iron-nickel core that generates a global magnetic field - a critical shield against solar wind that helps protect the atmosphere and surface life.<br><br><b>Composition:</b> A differentiated rocky planet with a solid inner core, liquid outer core, mantle, and crust. Roughly 71% of the surface is covered by liquid water, unique among known planets. The atmosphere is primarily nitrogen and oxygen, a composition fundamentally shaped by billions of years of biological activity.<br><br><b>Notable Features:</b> Earth's large Moon stabilises its axial tilt, moderating climate over long timescales. Plate tectonics continuously recycles the crust, regulates atmospheric carbon dioxide, and drives the geological activity that has shaped the surface throughout its 4.54 billion year history. The planet is currently in an interglacial period following the last ice age, and its dominant species - Homo sapiens - is measurably altering its atmosphere and climate in real time.<br><br><a href='https://en.wikipedia.org/wiki/Earth' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="venus" data-title="Venus" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/PIA23791-Venus-RealAndEnhancedContrastViews-20200608_%28cropped%29.jpg/960px-PIA23791-Venus-RealAndEnhancedContrastViews-20200608_%28cropped%29.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The second planet from the Sun and the closest in size to Earth, sometimes called Earth's twin - though its surface conditions are so extreme that the comparison quickly breaks down into a cautionary tale about atmospheric chemistry.<br><br><b>Distance from the Sun:</b> Orbits at an average of 0.72 AU - approximately 108 million kilometres from the Sun. Despite being closer to the Sun than Earth, it is actually the hottest planet in the Solar System due to its atmosphere rather than its distance.<br><br><b>Orbital Period:</b> One Venus year lasts approximately 225 Earth days. Strikingly, Venus rotates so slowly that its day is longer than its year - and it rotates in the opposite direction to most planets, meaning the Sun rises in the west and sets in the east.<br><br><b>Size:</b> Diameter of approximately 12,104 km - about 95% of Earth's. Despite the similar size, Venus has no magnetic field and no moon, and its surface pressure is about 92 times that of Earth's - equivalent to being roughly 900 metres underwater.<br><br><b>Composition:</b> A rocky terrestrial planet with a thick atmosphere composed almost entirely of carbon dioxide, with clouds of sulphuric acid. The greenhouse effect on Venus is so extreme that surface temperatures reach around 465 degrees Celsius - hot enough to melt lead - and remain nearly constant between day and night sides.<br><br><b>Notable Features:</b> Venus has more volcanoes than any other planet in the Solar System, with evidence suggesting some may still be active. Its surface, largely hidden beneath dense clouds, was mapped by NASA's Magellan spacecraft using radar in the early 1990s, revealing vast plains, highland regions, and enormous volcanic structures.<br><br><a href='https://en.wikipedia.org/wiki/Venus' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="mercury" data-title="Mercury" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Mercury_in_true_color.jpg/960px-Mercury_in_true_color.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The first planet from the Sun and the smallest in the Solar System, a heavily cratered, airless rock that swings closer to the Sun than any other planet and experiences the most extreme temperature swings in the Solar System.<br><br><b>Distance from the Sun:</b> Orbits at an average of 0.39 AU - approximately 58 million kilometres from the Sun, though its highly elliptical orbit means this varies considerably between 46 and 70 million kilometres.<br><br><b>Orbital Period:</b> One Mercury year lasts just 88 Earth days. However, due to its slow rotation and rapid orbit, a single solar day on Mercury - sunrise to sunrise - lasts approximately 176 Earth days, meaning a year passes in half a local day.<br><br><b>Size:</b> Diameter of approximately 4,880 km - only slightly larger than Earth's Moon. Despite its small size, Mercury is the second densest planet after Earth, suggesting a disproportionately large iron core that may account for up to 85% of its radius.<br><br><b>Composition:</b> A rocky terrestrial planet with virtually no atmosphere - only a tenuous exosphere of atoms blasted off its surface by solar wind. Without an atmosphere to redistribute heat, surface temperatures swing from around 430 degrees Celsius on the sun-facing side to minus 180 degrees Celsius at night.<br><br><b>Notable Features:</b> Despite its proximity to the Sun, radar observations and data from NASA's MESSENGER spacecraft confirmed the presence of water ice in permanently shadowed craters near the poles. The Caloris Basin, one of the largest impact craters in the Solar System at roughly 1,550 km in diameter, was formed by a collision so powerful it caused disrupted terrain on the exact opposite side of the planet.<br><br><a href='https://en.wikipedia.org/wiki/Mercury_(planet)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="sun" data-title="The Sun" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg/960px-The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The star at the centre of the Solar System and the source of virtually all energy driving planetary climates, biological processes, and geological activity across every body in orbit around it - a middle-aged, mid-sized star by galactic standards, though exceptional by any human measure.<br><br><b>Distance from Earth:</b> Approximately 1 AU - 149.6 million kilometres from Earth. Light and heat travel this distance in about 8 minutes and 20 seconds. The Sun is so large that roughly 1.3 million Earths could fit inside it.<br><br><b>Age &amp; Lifespan:</b> Approximately 4.6 billion years old, roughly halfway through its estimated 10 billion year lifespan as a main sequence star. In around 5 billion years it will exhaust its hydrogen fuel, expand into a red giant, and likely engulf the inner planets before collapsing into a white dwarf.<br><br><b>Size &amp; Mass:</b> Diameter of approximately 1.39 million kilometres - 109 times that of Earth. It contains 99.86% of all mass in the Solar System. Its gravitational influence extends far beyond the Kuiper Belt into the Oort Cloud, binding objects at distances of up to 100,000 AU.<br><br><b>Composition:</b> Composed of approximately 73% hydrogen and 25% helium by mass, with trace amounts of heavier elements. At its core, temperatures reach around 15 million degrees Celsius, sustaining the nuclear fusion reactions that convert hydrogen into helium and release the energy that drives the entire Solar System.<br><br><b>Notable Features:</b> The Sun's surface, called the photosphere, has a temperature of about 5,500 degrees Celsius, paradoxically cooler than the outer corona which reaches several million degrees - a discrepancy not yet fully explained. It produces a constant stream of charged particles called the solar wind, which shapes planetary magnetospheres, causes auroras, and gradually strips unprotected atmospheres like that of Mars.<br><br><a href='https://en.wikipedia.org/wiki/Sun' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="pluto" data-title="Pluto" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Pluto_in_True_Color_-_High-Res.png/960px-Pluto_in_True_Color_-_High-Res.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A dwarf planet in the Kuiper Belt and formerly the ninth planet of the Solar System until its reclassification in 2006, a small icy world with a surprisingly complex geology and a large companion moon <a href='https://en.wikipedia.org/wiki/Charon_(moon)' target='_blank'>Charon</a> that makes it effectively a double dwarf planet system.<br><br><b>Distance from the Sun:</b> Orbits at an average of 39.48 AU - approximately 5.9 billion kilometres from the Sun. Its highly elliptical orbit means it occasionally comes closer to the Sun than Neptune, as it did between 1979 and 1999.<br><br><b>Orbital Period:</b> One Pluto year lasts approximately 248 Earth years. It rotates once every 6.4 Earth days, and is tidally locked with its largest moon Charon - meaning the two bodies permanently face each other as they orbit their common centre of gravity.<br><br><b>Size:</b> Diameter of approximately 2,377 km - roughly 18% of Earth's diameter and about two thirds the size of Earth's Moon. Despite its small size it has five known moons: Charon, Styx, Nix, Kerberos, and Hydra.<br><br><b>Composition:</b> A mixture of rock and ice, with a surface covered in nitrogen, methane, and carbon monoxide ices. Its interior is thought to contain a rocky core possibly surrounded by a subsurface liquid water ocean, though this remains unconfirmed. Its thin atmosphere of nitrogen and methane collapses and freezes onto the surface when Pluto moves furthest from the Sun.<br><br><b>Notable Features:</b> NASA's New Horizons spacecraft flew past Pluto in July 2015, revealing a geologically active world with mountain ranges of water ice reaching 3,500 metres, vast nitrogen ice plains, and a distinctive heart-shaped region named Tombaugh Regio after Pluto's discoverer. The reclassification debate of 2006 remains one of the most publicly contested decisions in the history of the International Astronomical Union.<br><br><a href='https://en.wikipedia.org/wiki/Pluto' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="eris" data-title="Eris" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/6/63/Eris_and_moon_Dysnomia_JWST_NIRCam.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A dwarf planet in the scattered disc region beyond the Kuiper Belt and the most massive known dwarf planet in the Solar System - its discovery in 2005 directly triggered the reclassification of Pluto and the formal definition of what a planet actually is.<br><br><b>Distance from the Sun:</b> Orbits at an average of 67.8 AU - approximately 10.1 billion kilometres from the Sun, though its highly elliptical orbit carries it between 38 and 97 AU. At its most distant it is nearly twice as far from the Sun as Pluto.<br><br><b>Orbital Period:</b> One Eris year lasts approximately 559 Earth years. It is currently near its aphelion - its furthest point from the Sun - and will not reach perihelion for several centuries.<br><br><b>Size:</b> Diameter of approximately 2,326 km - marginally smaller than Pluto in diameter but about 27% more massive, making it the most massive known dwarf planet.<br><br><b>Composition:</b> Surface observations suggest a covering of methane ice, giving it a high reflectivity - one of the brightest known objects in the Solar System. Its interior is thought to be a mixture of rock and ice similar to Pluto, though far less is known about it given no spacecraft has visited.<br><br><b>Notable Features:</b> Eris was initially nicknamed Xena by its discoverers before receiving its official name, after the Greek goddess of discord - a fitting choice given the astronomical controversy it caused. Its discovery forced the International Astronomical Union to confront the question of planetary definition, ultimately resulting in Pluto's demotion in 2006. Its moon <a href='https://en.wikipedia.org/wiki/Dysnomia_(moon)' target='_blank'>Dysnomia</a>, named after the goddess of lawlessness and daughter of Eris in Greek mythology, is thought to be relatively small - estimated at around 700 km in diameter - and orbits Eris once every 15.8 days. The pairing of their names, Eris and Dysnomia, is one of the more elegantly consistent pieces of astronomical nomenclature in the outer Solar System.<br><br><a href='https://en.wikipedia.org/wiki/Eris_(dwarf_planet)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="makemake" data-title="Makemake" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/2/29/Makemake_and_its_moon.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A dwarf planet in the Kuiper Belt and one of the largest known objects in the outer Solar System, named after the creator deity of the Rapa Nui people of Easter Island - discovered in 2005 and formally recognised as a dwarf planet in 2008.<br><br><b>Distance from the Sun:</b> Orbits at an average of 45.8 AU - approximately 6.85 billion kilometres from the Sun. Its orbit is less elliptical than Eris or Pluto, keeping it more consistently within the classical Kuiper Belt.<br><br><b>Orbital Period:</b> One Makemake year lasts approximately 305 Earth years. It rotates once every 22.5 hours, giving it a day length not dramatically different from Earth's.<br><br><b>Size:</b> Diameter of approximately 1,430 km - roughly 40% of Pluto's diameter, making it the third largest known Kuiper Belt object after Pluto and Eris. It has one known moon, provisionally designated S/2015 (136472) 1 and informally nicknamed MK2, discovered in 2016.<br><br><b>Composition:</b> Its surface is covered in frozen methane, ethane, and possibly nitrogen ices, giving it a reddish-brown tint. Like Eris it has a high reflectivity. Makemake appears to have no significant atmosphere, or at most a very thin transient one that forms when it is closest to the Sun.<br><br><b>Notable Features:</b> The discovery of its moon, unofficially nicknamed <a href='https://en.wikipedia.org/wiki/S/2015_(136472)_1' target='_blank'>MK2</a>, was significant because it allowed astronomers to calculate Makemake's mass directly for the first time. The moon is much darker than Makemake itself, suggesting a different surface composition - possibly having lost its volatile ices over time due to its smaller size and weaker gravity.<br><br><a href='https://en.wikipedia.org/wiki/Makemake' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="haumea" data-title="Haumea" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/2/2b/Haumea_Hubble.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A dwarf planet in the Kuiper Belt and one of the most unusual objects in the outer Solar System, spinning so rapidly that it has been stretched into a distinctive elongated ellipsoid shape - more like a squashed rugby ball than a sphere.<br><br><b>Distance from the Sun:</b> Orbits at an average of 43.1 AU - approximately 6.45 billion kilometres from the Sun. Its orbit is moderately elliptical, keeping it within the classical Kuiper Belt for most of its journey.<br><br><b>Orbital Period:</b> One Haumea year lasts approximately 284 Earth years. Its rotation period is the most striking aspect of its dynamics - it completes one full rotation every 3.9 hours, the fastest of any known large object in the Solar System, and the primary reason for its distorted shape.<br><br><b>Size:</b> Its elongated shape makes a single diameter figure misleading - it measures approximately 2,100 km along its longest axis and around 1,000 km along its shortest. Despite this it is massive enough to have two known moons, <a href='https://en.wikipedia.org/wiki/Hi%CA%BBiaka_(moon)' target='_blank'>Hi'iaka</a> and <a href='https://en.wikipedia.org/wiki/Namaka_(moon)' target='_blank'>Namaka</a>, both named after Hawaiian goddesses associated with Haumea, the Hawaiian goddess of fertility and childbirth.<br><br><b>Composition:</b> Unlike most Kuiper Belt objects, Haumea's surface appears to be almost pure crystalline water ice, giving it a bright white appearance. Its interior is thought to be rocky, with the icy shell being relatively thin. It also has a faint ring system, discovered in 2017 - only the third ring system discovered around a Solar System object after Saturn and Uranus at the time.<br><br><b>Notable Features:</b> Haumea is thought to be the largest fragment of a catastrophic collision that occurred billions of years ago, with its two moons and a family of smaller Kuiper Belt objects sharing similar compositions - all likely debris from the same ancient impact event.<br><br><a href='https://en.wikipedia.org/wiki/Haumea' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="quaoar" data-title="Quaoar" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/a/a2/Quaoar_as_taken_by_NIRCam.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A mid-sized Kuiper Belt object and likely dwarf planet, named after the creation deity of the Tongva people of southern California - notable in recent years for possessing a ring system in a location that defied existing models of how planetary rings form and persist.<br><br><b>Distance from the Sun:</b> Orbits at an average of 43.4 AU - approximately 6.49 billion kilometres from the Sun. Its orbit is moderately circular by Kuiper Belt standards, keeping it within the classical belt throughout its journey.<br><br><b>Orbital Period:</b> One Quaoar year lasts approximately 288 Earth years. It rotates once every 8.8 hours, a fairly unremarkable rotation rate compared to the extremes seen in Haumea.<br><br><b>Size:</b> Diameter of approximately 1,090 km - roughly half of Pluto's diameter. It has one known moon, <a href='https://en.wikipedia.org/wiki/Weywot' target='_blank'>Weywot</a>, named after the sky god and son of Quaoar in Tongva mythology, which orbits at a distance of about 14,500 km and completes one orbit every 12.4 days.<br><br><b>Composition:</b> Surface observations suggest a mixture of water ice and rock, with possible traces of ammonia hydrate. Its density appears higher than many Kuiper Belt objects, hinting at a proportionally larger rocky interior. The surface shows evidence of some degree of geological or cryovolcanic activity in the past.<br><br><b>Notable Features:</b> In 2023 observations confirmed that Quaoar possesses a ring system orbiting at a distance far beyond what the Roche limit - the theoretical boundary within which rings should form - would predict. This discovery challenged existing ring formation models and suggested that the icy material in Quaoar's ring may be too rigid to clump into a moon, keeping it in ring form despite the unexpected distance.<br><br><a href='https://en.wikipedia.org/wiki/Quaoar' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="orcus" data-title="Orcus" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/4/4b/Orcus-Vanth_orbit.gif' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A dwarf planet candidate in the Kuiper Belt sometimes called the anti-Pluto - it orbits the Sun in a remarkably similar path to Pluto but always on the opposite side, and shares enough physical similarities that the comparison has become a standard reference point in outer Solar System discussions.<br><br><b>Distance from the Sun:</b> Orbits at an average of 39.2 AU - approximately 5.87 billion kilometres from the Sun. Its orbit is inclined and elliptical in a manner closely mirroring Pluto's, ranging between roughly 30 and 48 AU.<br><br><b>Orbital Period:</b> One Orcus year lasts approximately 245 Earth years, again closely matching Pluto's 248 years. Like Pluto it is in a 2:3 orbital resonance with Neptune, meaning it completes exactly two orbits for every three Neptune completes.<br><br><b>Size:</b> Diameter of approximately 910 km, making it one of the larger Kuiper Belt objects though smaller than Pluto. It has one known moon, <a href='https://en.wikipedia.org/wiki/Vanth_(moon)' target='_blank'>Vanth</a>, which is unusually large relative to Orcus - roughly half its diameter - and named after an Etruscan winged deity who guided souls to the underworld, fitting given Orcus is the Roman god of the underworld and punisher of broken oaths.<br><br><b>Composition:</b> Surface spectroscopy suggests a mixture of water ice and possibly ammonia hydrates, with a relatively dark and neutral-coloured surface. The presence of ammonia ice is particularly interesting as it may indicate relatively recent cryovolcanic activity, since ammonia ice is destroyed by radiation over long timescales and would need to be replenished.<br><br><b>Notable Features:</b> The Orcus-Vanth system is notable for the large size ratio between the two bodies, similar to the Pluto-Charon relationship. Some astronomers consider them a binary dwarf planet system rather than a primary and moon. No spacecraft has visited Orcus and much of what is known comes from Earth-based and Hubble Space Telescope observations.<br><br><a href='https://en.wikipedia.org/wiki/Orcus_(dwarf_planet)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="sedna" data-title="Sedna" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/0/02/Sedna_PRC2004-14d.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A distant trans-Neptunian object with the most elongated orbit of any known large Solar System body, so far from the Sun for most of its journey that it occupies a poorly understood region between the Kuiper Belt and the hypothetical Oort Cloud - a world that raises more questions than it answers.<br><br><b>Distance from the Sun:</b> Orbits between approximately 76 AU at perihelion and a staggering 937 AU at aphelion - roughly 140 billion kilometres at its most distant. It is currently approaching perihelion, which it will reach around 2076, and is one of the few large Solar System objects visible from Earth at such extreme distances.<br><br><b>Orbital Period:</b> One Sedna year lasts approximately 11,000 Earth years. For the vast majority of that time it is so far from the Sun that temperatures on its surface remain close to minus 240 degrees Celsius - only about 33 degrees above absolute zero.<br><br><b>Size:</b> Diameter of approximately 995 km, though estimates vary due to the difficulty of observing it at such distance. No moon has been confirmed, which is itself somewhat unusual for an object of its size and is a point of ongoing interest among planetary scientists.<br><br><b>Composition:</b> Its surface appears to be covered in a mixture of water, methane, and nitrogen ices along with tholins - complex organic compounds formed by radiation acting on simpler molecules - giving it one of the reddest surfaces of any Solar System object after Mars.<br><br><b>Notable Features:</b> Sedna's extreme orbit has no satisfying explanation within standard Solar System formation models. Leading hypotheses include a close encounter with a passing star in the early Solar System, gravitational influence from the hypothetical Planet Nine, or even capture from another star system entirely. Its existence is one of the key pieces of evidence cited in the ongoing search for Planet Nine.<br><br><a href='https://en.wikipedia.org/wiki/Sedna_(dwarf_planet)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="triton" data-title="Triton" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Triton-usgs23-with-frame.jpg/960px-Triton-usgs23-with-frame.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The largest moon of Neptune and one of the most geologically active bodies in the outer Solar System, unique among large moons in orbiting its planet in the opposite direction to Neptune's rotation - a strong indicator that it was captured from the Kuiper Belt rather than forming alongside Neptune.<br><br><b>Distance from Neptune:</b> Orbits at an average of 354,759 km from Neptune, completing one orbit every 5.88 Earth days. Its retrograde orbit is gradually decaying due to tidal interactions - in approximately 3.6 billion years Triton will cross Neptune's Roche limit and be torn apart into a ring system.<br><br><b>Distance from the Sun:</b> As a moon of Neptune, Triton orbits at an average of 30.07 AU from the Sun - approximately 4.5 billion kilometres.<br><br><b>Size:</b> Diameter of approximately 2,707 km - making it the seventh largest moon in the Solar System and larger than Pluto. It is massive enough to have pulled itself into a spherical shape through its own gravity.<br><br><b>Composition:</b> Triton's surface is covered in nitrogen ice and dry ice - frozen carbon dioxide - with a thin nitrogen atmosphere. Its interior is thought to contain a rocky core surrounded by an icy mantle, and there is speculation about a subsurface liquid water ocean maintained by tidal heating from Neptune's gravitational pull.<br><br><b>Notable Features:</b> Voyager 2's 1989 flyby revealed active geysers on Triton's surface, erupting dark plumes of nitrogen gas and dust several kilometres into the thin atmosphere before being carried downwind. Surface temperatures of around minus 235 degrees Celsius make it one of the coldest measured surfaces in the Solar System. Its captured origin likely disrupted the orbits of any original Neptunian moons, making Triton a significant force in shaping Neptune's current moon system.<br><br><a href='https://en.wikipedia.org/wiki/Triton_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="proteus" data-title="Proteus" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/8/83/Proteus_%28Voyager_2%29.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The second largest moon of Neptune and the largest of its inner moons, an irregularly shaped dark body that was unknown until Voyager 2's 1989 flyby - it is so close to Neptune and so poorly reflective that it escaped detection from Earth entirely despite being larger than several known moons of other planets.<br><br><b>Distance from Neptune:</b> Orbits at an average of 117,647 km from Neptune, completing one orbit every 1.12 Earth days. It is tidally locked to Neptune, always presenting the same face toward the planet.<br><br><b>Distance from the Sun:</b> As a moon of Neptune, Proteus orbits at an average of 30.07 AU from the Sun - approximately 4.5 billion kilometres.<br><br><b>Size:</b> Approximately 420 km in diameter, though its irregular shape means this is an average figure. It is thought to be close to the maximum size an irregular body can reach before its own gravity pulls it into a sphere - just below the threshold, in other words.<br><br><b>Composition:</b> Very little is known about Proteus's internal composition. Its surface is extremely dark, reflecting only about 10% of incoming sunlight, and appears heavily cratered with no signs of geological activity. It is likely composed of water ice mixed with rock and dark organic material similar to other inner Neptunian moons.<br><br><b>Notable Features:</b> Its most prominent surface feature is Pharos, a large impact crater approximately 255 km across - enormous relative to the moon's total size. The fact that Proteus survived the impact that created Pharos without being shattered suggests it has some degree of internal cohesion. Given Triton's captured origin likely disrupted Neptune's original moon system, Proteus may itself be a remnant or re-accreted fragment from that ancient disruption.<br><br><a href='https://en.wikipedia.org/wiki/Proteus_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="nereid" data-title="Nereid" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/b/b0/Nereid-Voyager2.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The third largest moon of Neptune and one of the most irregularly orbiting moons in the Solar System, with an extraordinarily elongated orbit that takes it on a wild elliptical path - likely the result of gravitational disruption caused by Triton's capture billions of years ago.<br><br><b>Distance from Neptune:</b> Its highly elliptical orbit ranges from approximately 1.4 million km at closest approach to over 9.6 million km at its most distant - the most eccentric orbit of any known moon in the Solar System. It completes one orbit every 360 Earth days, almost exactly one Earth year.<br><br><b>Distance from the Sun:</b> As a moon of Neptune, Nereid orbits at an average of 30.07 AU from the Sun - approximately 4.5 billion kilometres.<br><br><b>Size:</b> Diameter of approximately 340 km, making it irregularly shaped and unable to pull itself into a sphere through its own gravity. Its surface brightness varies significantly over short periods, suggesting either an irregular shape tumbling through space or a surface with dramatically different reflective patches.<br><br><b>Composition:</b> Very little is known with certainty. Surface observations suggest water ice mixed with dark material, giving it a relatively low reflectivity. Its unusual brightness variations remain incompletely explained and are a subject of ongoing study.<br><br><b>Notable Features:</b> Nereid was discovered in 1949 by Gerard Kuiper - the same astronomer after whom the Kuiper Belt is named - making it the second Neptunian moon discovered after Triton. Voyager 2 passed too far from Nereid in 1989 to obtain detailed images, meaning it remains one of the least well characterised moons of any outer planet. Its chaotic orbit is considered strong evidence of the violent gravitational reshuffling that followed Triton's capture into Neptune's system.<br><br><a href='https://en.wikipedia.org/wiki/Nereid_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="larissa" data-title="Larissa" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/5/5b/Larissa_1.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A small inner moon of Neptune, irregularly shaped and heavily cratered, orbiting so close to Neptune that it completes a full orbit in less than a single Earth day - one of several inner Neptunian moons thought to be remnants or re-accreted debris from the catastrophic disruption caused by Triton's capture.<br><br><b>Distance from Neptune:</b> Orbits at an average of 73,548 km from Neptune, completing one orbit every 0.555 Earth days - just over 13 hours. It is tidally locked to Neptune, always presenting the same face toward the planet.<br><br><b>Distance from the Sun:</b> As a moon of Neptune, Larissa orbits at an average of 30.07 AU from the Sun - approximately 4.5 billion kilometres.<br><br><b>Size:</b> Approximately 194 km in average diameter, with an irregular elongated shape measuring roughly 216 by 204 by 168 km. It is far too small for its own gravity to pull it into a sphere.<br><br><b>Composition:</b> Essentially unknown in detail. Like Proteus and other inner Neptunian moons, Larissa is thought to be composed of water ice mixed with rock and dark organic material. Its surface appears heavily cratered with no evidence of geological activity, suggesting a geologically dead body that has simply accumulated impact scars over billions of years.<br><br><b>Notable Features:</b> Larissa was first tentatively detected in 1981 when it briefly blocked the light of a background star, but was not confirmed and formally identified until Voyager 2's flyby in 1989. Like several other inner Neptunian moons its orbit is slowly decaying inward due to tidal interactions with Neptune, and it is expected to either impact Neptune or be broken up into a ring system in the distant future - a fate it shares with Triton, though on a different timescale.<br><br><a href='https://en.wikipedia.org/wiki/Larissa_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="galatea" data-title="Galatea" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/d/d8/Galatea_moon.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A small inner moon of Neptune orbiting well within the planet's ring system, notable primarily for its gravitational role in shepherding and maintaining the Adams ring - Neptune's outermost and most distinct ring - through a process of orbital resonance.<br><br><b>Distance from Neptune:</b> Orbits at an average of 61,953 km from Neptune, completing one orbit every 0.429 Earth days - just over 10 hours. It orbits just inside the Adams ring, whose arcs it helps confine through gravitational interaction.<br><br><b>Distance from the Sun:</b> As a moon of Neptune, Galatea orbits at an average of 30.07 AU from the Sun - approximately 4.5 billion kilometres.<br><br><b>Size:</b> Approximately 176 km in average diameter with an irregular shape, far too small for self-gravity to produce a spherical form. Like other inner Neptunian moons it is tidally locked, permanently facing Neptune with the same hemisphere.<br><br><b>Composition:</b> Poorly characterised due to limited observational data. Surface properties suggest dark water ice mixed with rocky and organic material, consistent with other inner Neptunian moons. No geological activity has been detected and its surface is presumed heavily cratered.<br><br><b>Notable Features:</b> Galatea's most significant role in the Neptunian system is gravitational rather than physical - its orbital resonance with the Adams ring is thought to be responsible for confining the ring's material into the distinct arcs observed by Voyager 2 in 1989, rather than spreading uniformly around the orbit. Like most inner Neptunian moons it was discovered during that same Voyager 2 flyby and has not been visited by any subsequent spacecraft.<br><br><a href='https://en.wikipedia.org/wiki/Galatea_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="despina" data-title="Despina" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/5/5f/Despina.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A small inner moon of Neptune and one of the closest moons to the planet, acting as a shepherd moon for Neptune's Le Verrier ring - one of several irregularly shaped inner moons thought to have formed from debris left over after Triton's capture disrupted Neptune's original satellite system.<br><br><b>Distance from Neptune:</b> Orbits at an average of 52,526 km from Neptune, completing one orbit every 0.335 Earth days - just over 8 hours. It orbits very close to the Le Verrier ring, whose inner edge it helps define through gravitational shepherding.<br><br><b>Distance from the Sun:</b> As a moon of Neptune, Despina orbits at an average of 30.07 AU from the Sun - approximately 4.5 billion kilometres.<br><br><b>Size:</b> Approximately 150 km in average diameter with a notably irregular shape, estimated at roughly 180 by 148 by 128 km. Like Galatea and Larissa it is tidally locked to Neptune and far too small to achieve hydrostatic equilibrium - the condition required to pull itself into a sphere.<br><br><b>Composition:</b> As with most inner Neptunian moons, Despina's composition is poorly constrained. It is assumed to be a mixture of water ice, rock, and dark organic compounds based on its low surface reflectivity and similarity to its neighbours. No signs of geological activity have been identified.<br><br><b>Notable Features:</b> Despina was discovered by Voyager 2 in 1989 and named after a daughter of Neptune and Demeter in Greek mythology. Its shepherding relationship with the Le Verrier ring mirrors Galatea's role with the Adams ring, suggesting that Neptune's ring system is actively maintained by the gravitational influence of these small inner moons rather than being a static leftover structure. Without their stabilising influence the rings would likely disperse over relatively short astronomical timescales.<br><br><a href='https://en.wikipedia.org/wiki/Despina_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="thalassa" data-title="Thalassa" data-desc="<br>A small inner moon of Neptune and one of the innermost in the system, a dark irregularly shaped body orbiting just outside Neptune's ring system and thought to be a re-accreted fragment from the violent restructuring of Neptune's original satellite system following Triton's capture.<br><br><b>Distance from Neptune:</b> Orbits at an average of 50,074 km from Neptune, completing one orbit every 0.311 Earth days - approximately 7.5 hours. It orbits just outside Neptune's Galle ring, the innermost of Neptune's known rings.<br><br><b>Distance from the Sun:</b> As a moon of Neptune, Thalassa orbits at an average of 30.07 AU from the Sun - approximately 4.5 billion kilometres.<br><br><b>Size:</b> Approximately 108 km in average diameter with a flattened irregular shape, estimated at roughly 108 by 100 by 52 km - notably flat compared to other inner moons. It is tidally locked to Neptune and far too small to achieve a spherical form under its own gravity.<br><br><b>Composition:</b> Like its neighbours, Thalassa is assumed to consist of water ice mixed with rock and dark organic material based on its low reflectivity. Its surface is presumed heavily cratered and geologically inactive, with no observational evidence suggesting otherwise.<br><br><b>Notable Features:</b> Thalassa was discovered by Voyager 2 in 1989 and named after a sea goddess in Greek mythology - a daughter of Aether and Hemera. Its notably flattened shape distinguishes it from other inner Neptunian moons and may reflect the conditions under which it re-accreted from a debris disc following Triton's capture. Like several other inner Neptunian moons its orbit is slowly decaying inward and it is expected to eventually be destroyed by tidal forces or impact Neptune itself in the distant future.<br><br><a href='https://en.wikipedia.org/wiki/Thalassa_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="naiad" data-title="Naiad" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/f/f3/Naiad_Voyager.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The innermost known moon of Neptune and the closest natural satellite to its parent planet in the entire Solar System, a small dark irregularly shaped body whose orbital behaviour is among the most unusual of any known moon - it follows a tilted, zigzagging path that baffled astronomers until a gravitational interaction with the neighbouring moon Thalassa was identified as the cause.<br><br><b>Distance from Neptune:</b> Orbits at an average of 48,227 km from Neptune, completing one orbit every 0.294 Earth days - approximately 7 hours. Its orbit is notably inclined and follows an unusual weaving pattern relative to Thalassa's orbit, the two moons locked in a gravitational dance that keeps them perpetually avoiding close encounters.<br><br><b>Distance from the Sun:</b> As a moon of Neptune, Naiad orbits at an average of 30.07 AU from the Sun - approximately 4.5 billion kilometres.<br><br><b>Size:</b> Approximately 96 km in average diameter, making it the smallest of Neptune's named inner moons. Its irregular shape and small size mean it is held together more by material strength than by self-gravity.<br><br><b>Composition:</b> Essentially unknown in detail beyond the general assumption of dark water ice, rock, and organic material shared by all inner Neptunian moons. Its surface reflectivity is very low and no geological activity has been observed.<br><br><b>Notable Features:</b> Naiad was discovered by Voyager 2 in 1989 but its unusual orbital behaviour was not fully explained until 2020, when astronomers using Hubble Space Telescope data determined that it is in a specific orbital resonance with Thalassa - completing 73 orbits for every 69 Thalassa completes. This resonance causes Naiad's orbit to appear to zigzag when viewed relative to Thalassa, the two moons passing each other at alternating distances in a pattern that has remained stable for an unknown but potentially very long period.<br><br><a href='https://en.wikipedia.org/wiki/Naiad_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="titania" data-title="Titania" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/f/f4/Titania_VGR2_C2684315.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The largest moon of Uranus and one of the more quietly intriguing worlds in the outer Solar System, Titania is a frozen, cratered landscape shaped by both impacts and internal forces long since faded.<br><br><b>Distance from Uranus:</b> Orbits at an average of 436,300 km, completing one orbit every 8.71 Earth days. Like most large moons, it is tidally locked, always showing the same face to Uranus.<br><br><b>Distance from the Sun:</b> As part of the Uranian system, Titania orbits at an average of 19.2 AU - approximately 2.87 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 1,578 km - making it the eighth largest moon in the Solar System. It is large enough to be spherical due to its own gravity.<br><br><b>Composition:</b> A roughly equal mix of water ice and rock, with a surface darkened by space weathering. Its interior may be partially differentiated, possibly with a subsurface ocean in the distant past.<br><br><b>Notable Features:</b> Titania's surface is marked by enormous fault valleys and canyons, some stretching for hundreds of kilometres - evidence that the moon once expanded internally, cracking its icy crust. The largest known canyon, Messina Chasma, rivals some of the great rift systems found elsewhere in the Solar System. It is named, like all major Uranian moons, after characters from Shakespeare.<br><br><a href='https://en.wikipedia.org/wiki/Titania_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="oberon" data-title="Oberon" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/6/6d/Oberon_in_true_color_by_Kevin_M._Gill.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The outermost of Uranus' major moons, Oberon is a dark, heavily cratered world that has remained largely unchanged for billions of years - a frozen archive of the Solar System's violent past.<br><br><b>Distance from Uranus:</b> Orbits at an average of 583,500 km, taking 13.46 Earth days to complete one orbit. It is also tidally locked to Uranus.<br><br><b>Distance from the Sun:</b> Shares Uranus' average distance of 19.2 AU - approximately 2.87 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 1,523 km - slightly smaller than Titania, making it the second largest Uranian moon.<br><br><b>Composition:</b> A mixture of water ice and rock, similar to Titania, though its darker surface suggests a higher concentration of carbon-rich material or accumulated debris from micrometeorite impacts.<br><br><b>Notable Features:</b> Oberon's surface is dominated by impact craters, some with bright ray systems indicating relatively fresh impacts. Unlike Titania, it shows far less evidence of internal resurfacing - suggesting it cooled early and remained geologically inactive. Several large craters contain bright deposits, possibly exposed ice from beneath the darker surface layer.<br><br><a href='https://en.wikipedia.org/wiki/Oberon_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="umbriel" data-title="Umbriel" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/2/2f/PIA00040_Umbrielx2.47.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A dark and enigmatic moon of Uranus, Umbriel is the most visually subdued of the planet's major satellites - a heavily cratered world that appears to have experienced little internal activity since its formation.<br><br><b>Distance from Uranus:</b> Orbits at an average of 266,000 km, completing one orbit every 4.14 Earth days. It is tidally locked, always presenting the same face toward Uranus.<br><br><b>Distance from the Sun:</b> As part of the Uranian system, it orbits at an average of 19.2 AU - approximately 2.87 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 1,169 km - making it the third largest moon of Uranus.<br><br><b>Composition:</b> Composed primarily of water ice mixed with rock, with a notably dark surface likely coated in carbon-rich material altered by long-term exposure to radiation.<br><br><b>Notable Features:</b> Umbriel's surface is densely packed with impact craters and shows almost no signs of geological resurfacing. Its most distinctive feature is Wunda crater, which contains a bright central ring that stands out starkly against the otherwise dark terrain - a rare hint of fresher material exposed from beneath the surface. Compared to its siblings, Umbriel appears geologically inert - a world that froze early and stayed that way.<br><br><a href='https://en.wikipedia.org/wiki/Umbriel_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="ariel" data-title="Ariel" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Ariel_in_monochrome.jpg/960px-Ariel_in_monochrome.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The brightest and one of the most geologically active moons of Uranus, Ariel presents a striking contrast to Umbriel - its surface shows extensive evidence of past tectonic and possibly cryovolcanic activity.<br><br><b>Distance from Uranus:</b> Orbits at an average of 191,000 km, completing one orbit every 2.52 Earth days. It is tidally locked to Uranus.<br><br><b>Distance from the Sun:</b> Shares Uranus' average distance of 19.2 AU - approximately 2.87 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 1,158 km - slightly smaller than Umbriel, but far more geologically complex.<br><br><b>Composition:</b> A mixture of water ice and rock, with a relatively bright surface suggesting more recent resurfacing. The presence of carbon dioxide ice has also been detected, likely trapped or replenished over time.<br><br><b>Notable Features:</b> Ariel's surface is crisscrossed by vast networks of canyons, fault valleys, and smooth plains that appear to have been resurfaced by flows of icy material - possibly from cryovolcanism, where water and other volatiles erupt instead of molten rock. This indicates that Ariel remained internally active longer than its neighbouring moons. Among Uranus' satellites, it is considered the youngest surface geologically - which, in this part of the Solar System, is saying something.<br><br><a href='https://en.wikipedia.org/wiki/Ariel_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="miranda" data-title="Miranda" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Miranda_mosaic_in_color_-_Voyager_2.png/960px-Miranda_mosaic_in_color_-_Voyager_2.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The smallest and innermost of Uranus' five major moons, Miranda is one of the most bizarrely shaped and geologically chaotic worlds in the Solar System - a patchwork of mismatched terrain that looks as though it was assembled from pieces.<br><br><b>Distance from Uranus:</b> Orbits at an average of 129,900 km, completing one orbit every 1.41 Earth days. It is tidally locked to Uranus.<br><br><b>Distance from the Sun:</b> Shares Uranus' average distance of 19.2 AU - approximately 2.87 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 472 km - far smaller than the other major Uranian moons, yet disproportionately complex.<br><br><b>Composition:</b> Primarily water ice mixed with rock. Its low density suggests a high proportion of ice, and possibly a loosely consolidated interior.<br><br><b>Notable Features:</b> Miranda hosts enormous cliff faces, including Verona Rupes, which rises up to 20 km - one of the tallest known cliffs in the Solar System. Its surface is divided into distinct regions called coronae, featuring ridges, valleys, and strange geometric patterns. The leading theory suggests Miranda was shattered by a massive impact and later reassembled, explaining its chaotic appearance.<br><br><a href='https://en.wikipedia.org/wiki/Miranda_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="puck" data-title="Puck" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/d/d1/Puck%2C_moon_of_Uranus_%281986%29.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A small inner moon of Uranus, Puck occupies a middle ground between the planet's larger spherical moons and its irregular outer satellites - a modest, cratered body with little geological activity.<br><br><b>Distance from Uranus:</b> Orbits at an average of 86,000 km, completing one orbit every 0.76 Earth days - less than 19 hours. It is tidally locked to Uranus.<br><br><b>Distance from the Sun:</b> As part of the Uranian system, it orbits at an average of 19.2 AU - approximately 2.87 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 162 km, making it too small for its gravity to form a perfect sphere, though it appears roughly rounded.<br><br><b>Composition:</b> Likely composed of water ice mixed with darker rocky material. Its surface reflectivity is low, suggesting space weathering and accumulation of dark material.<br><br><b>Notable Features:</b> Puck's surface is heavily cratered, with several large craters relative to its size. It shows no signs of geological activity or resurfacing, indicating it has remained largely unchanged since its formation. Discovered in 1985, it was later imaged in detail by Voyager 2 in 1986.<br><br><a href='https://en.wikipedia.org/wiki/Puck_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="caliban" data-title="Caliban" data-desc="<br>An irregular outer moon of Uranus, Caliban is part of a distant population of small satellites that orbit far from the planet, likely captured objects rather than bodies formed in place.<br><br><b>Distance from Uranus:</b> Orbits at an average of approximately 7.2 million km, taking about 579 Earth days to complete one orbit. Its orbit is eccentric and inclined, unlike the regular inner moons.<br><br><b>Distance from the Sun:</b> Shares Uranus' average distance of 19.2 AU - approximately 2.87 billion kilometres from the Sun.<br><br><b>Size:</b> Estimated diameter of around 72 km, making it a small, irregularly shaped body.<br><br><b>Composition:</b> Likely composed of a mixture of rock and ice with a dark, reddish surface, suggesting the presence of complex organic compounds altered by radiation.<br><br><b>Notable Features:</b> Caliban orbits Uranus in a retrograde direction - opposite to the planet's rotation - strongly indicating it was captured by Uranus' gravity rather than forming alongside it. Its distant and tilted orbit places it in a dynamically distinct group of outer moons, offering clues about the chaotic early history of the Uranian system.<br><br><a href='https://en.wikipedia.org/wiki/Caliban_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="sycorax" data-title="Sycorax" data-desc="<br>The largest of Uranus' irregular outer moons, Sycorax is a distant and dimly lit world that likely originated far from Uranus before being captured into its orbit.<br><br><b>Distance from Uranus:</b> Orbits at an average of approximately 12.2 million km, taking about 1,288 Earth days to complete one orbit. Its path is highly inclined and eccentric.<br><br><b>Distance from the Sun:</b> As part of the Uranian system, it orbits at an average of 19.2 AU - approximately 2.87 billion kilometres from the Sun.<br><br><b>Size:</b> Estimated diameter of approximately 157 km - making it the largest known irregular moon of Uranus.<br><br><b>Composition:</b> Likely a mixture of rock and ice with a dark, reddish surface, similar to other captured outer moons and some Kuiper Belt objects.<br><br><b>Notable Features:</b> Sycorax also orbits in a retrograde direction, reinforcing its captured origin. Its relatively large size compared to other irregular moons suggests it may be the remnant of a larger object that was broken apart, or one of the more substantial bodies successfully captured by Uranus' gravity. Its orbit places it far beyond the regular moon system, in a region populated by loosely bound, dynamically complex satellites.<br><br><a href='https://en.wikipedia.org/wiki/Sycorax_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="titan" data-title="Titan" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/f/fe/Titan_in_true_color_by_Kevin_M._Gill.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The largest moon of Saturn and one of the most Earth-like worlds in the Solar System - though at temperatures that would freeze your blood solid before you could appreciate the view.<br><br><b>Distance from Saturn:</b> Orbits at an average of 1,221,870 km, completing one orbit every 15.95 Earth days. It is tidally locked to Saturn.<br><br><b>Distance from the Sun:</b> As part of the Saturnian system, it orbits at an average of 9.58 AU - approximately 1.43 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 5,151 km - making it the second largest moon in the Solar System, larger than the planet Mercury.<br><br><b>Composition:</b> A mix of rock and ice, with a dense nitrogen-rich atmosphere - the only moon in the Solar System with one. Surface pressure is about 1.5 times that of Earth.<br><br><b>Notable Features:</b> Titan hosts lakes, rivers, and seas - not of water, but liquid methane and ethane. Beneath its thick orange haze lies a landscape shaped by weather, erosion, and possibly cryovolcanism. Evidence suggests a subsurface ocean of liquid water may exist beneath its icy crust. It is considered one of the most promising locations for studying prebiotic chemistry - chemistry that may resemble the early stages of life.<br><br><a href='https://en.wikipedia.org/wiki/Titan_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="rhea" data-title="Rhea" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/PIA07763_Rhea_full_globe5.jpg/960px-PIA07763_Rhea_full_globe5.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The second largest moon of Saturn, Rhea is a cold, heavily cratered world that represents the more typical fate of mid-sized icy moons - geologically quiet and largely unchanged for billions of years.<br><br><b>Distance from Saturn:</b> Orbits at an average of 527,000 km, completing one orbit every 4.52 Earth days. It is tidally locked to Saturn.<br><br><b>Distance from the Sun:</b> Shares Saturn's average distance of 9.58 AU - approximately 1.43 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 1,528 km - making it the ninth largest moon in the Solar System.<br><br><b>Composition:</b> Composed mostly of water ice with a smaller fraction of rock, giving it a relatively low density. Its bright surface reflects a significant portion of incoming sunlight.<br><br><b>Notable Features:</b> Rhea's surface is saturated with impact craters, including several very large basins. There is tentative evidence that it may have a very thin oxygen and carbon dioxide atmosphere - extremely tenuous, but noteworthy. Some observations have suggested it may once have had a faint ring system, though this remains debated.<br><br><a href='https://en.wikipedia.org/wiki/Rhea_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="iapetus" data-title="Iapetus" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Iapetus_trailing_natural_color.jpg/960px-Iapetus_trailing_natural_color.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>One of Saturn's most peculiar moons, Iapetus is famous for its dramatic two-tone coloration - one hemisphere is as dark as coal, while the other is bright and reflective, creating one of the starkest contrasts in the Solar System.<br><br><b>Distance from Saturn:</b> Orbits at an average of 3,560,800 km, taking 79.3 Earth days to complete one orbit. It is tidally locked to Saturn.<br><br><b>Distance from the Sun:</b> Shares Saturn's average distance of 9.58 AU - approximately 1.43 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 1,471 km.<br><br><b>Composition:</b> A mixture of water ice and rock, with the dark material on its leading hemisphere likely originating from external sources and then amplified by thermal processes.<br><br><b>Notable Features:</b> The dark region, called Cassini Regio, absorbs more sunlight, causing ice to turn into vapor and move to the brighter side, which reinforces the contrast. Even more unusual is a massive equatorial ridge that runs nearly around the entire moon, rising up to 20 kilometers high and giving Iapetus a distinctive walnut-like appearance. Its origin remains uncertain, with ideas ranging from an ancient ring collapse to internal processes.<br><br><a href='https://en.wikipedia.org/wiki/Iapetus_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="dione" data-title="Dione" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Dione_in_natural_light.jpg/960px-Dione_in_natural_light.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A mid-sized icy moon of Saturn that, at first glance, appears heavily cratered and inactive - yet closer inspection reveals signs of a more dynamic past.<br><br><b>Distance from Saturn:</b> Orbits at an average of 377,400 km, completing one orbit every 2.74 Earth days. It is tidally locked to Saturn.<br><br><b>Distance from the Sun:</b> As part of the Saturnian system, it orbits at an average of 9.58 AU - approximately 1.43 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 1,123 km.<br><br><b>Composition:</b> Primarily water ice with a rocky interior. Its relatively high density suggests a greater proportion of rock compared to smaller icy moons.<br><br><b>Notable Features:</b> Dione is known for its bright “wispy terrain” - streaks of ice cliffs and fractures formed by tectonic activity rather than deposits. These features indicate that Dione was once geologically active, possibly driven by tidal heating. There is also evidence suggesting a subsurface ocean may exist deep beneath its crust, placing it among the growing list of ocean-world candidates in the outer Solar System.<br><br><a href='https://en.wikipedia.org/wiki/Dione_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="tethys" data-title="Tethys" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Tethys_-_Rev_15_%2837267740632%29.png/960px-Tethys_-_Rev_15_%2837267740632%29.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A mid-sized icy moon of Saturn, Tethys is a remarkably bright and heavily cratered world dominated by two enormous geological features that define its entire appearance.<br><br><b>Distance from Saturn:</b> Orbits at an average of 294,700 km, completing one orbit every 1.89 Earth days. It is tidally locked to Saturn.<br><br><b>Distance from the Sun:</b> As part of the Saturnian system, it orbits at an average of 9.58 AU - approximately 1.43 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 1,062 km.<br><br><b>Composition:</b> Almost entirely composed of water ice, making it one of the least dense moons in the Solar System - essentially a frozen sphere with very little rock.<br><br><b>Notable Features:</b> Tethys is dominated by the enormous impact crater Odysseus, which spans about 400 km - nearly half the moon's diameter. It also features Ithaca Chasma, a vast canyon system stretching over 2,000 km across the surface, likely formed when the moon's interior froze and expanded, cracking the crust. Despite these dramatic features, Tethys shows little evidence of recent geological activity.<br><br><a href='https://en.wikipedia.org/wiki/Tethys_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="enceladus" data-title="Enceladus" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/PIA17202_-_Approaching_Enceladus.jpg/960px-PIA17202_-_Approaching_Enceladus.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A small but extraordinarily active moon of Saturn, Enceladus is one of the most important targets in the search for extraterrestrial life in the Solar System.<br><br><b>Distance from Saturn:</b> Orbits at an average of 238,000 km, completing one orbit every 1.37 Earth days. It is tidally locked to Saturn.<br><br><b>Distance from the Sun:</b> Shares Saturn's average distance of 9.58 AU - approximately 1.43 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 504 km.<br><br><b>Composition:</b> Primarily water ice with a rocky core. Beneath its icy crust lies a global subsurface ocean of liquid water.<br><br><b>Notable Features:</b> Enceladus ejects massive plumes of water vapor, ice particles, and organic compounds from fractures near its south pole, known as tiger stripes. These geysers feed Saturn's E ring and provide direct evidence of an underground ocean that is in contact with rock, which is a key condition for potential life. Measurements from the Cassini spacecraft detected salts and organic molecules in the plumes, making Enceladus one of the most exciting environments to search for alien life.<br><br><a href='https://en.wikipedia.org/wiki/Enceladus' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="mimas" data-title="Mimas" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Mimas_Masked.jpg/960px-Mimas_Masked.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A small icy moon of Saturn best known for a single overwhelming feature that defines its entire appearance - and has earned it an unfortunate cultural comparison.<br><br><b>Distance from Saturn:</b> Orbits at an average of 185,500 km, completing one orbit every 0.94 Earth days. It is tidally locked to Saturn.<br><br><b>Distance from the Sun:</b> As part of the Saturnian system, it orbits at an average of 9.58 AU - approximately 1.43 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 396 km.<br><br><b>Composition:</b> Mostly water ice with a small amount of rock, giving it a low density and relatively weak structural integrity.<br><br><b>Notable Features:</b> The massive Herschel crater, about 130 km across, dominates Mimas' surface and gives it a striking resemblance to a certain fictional battle station - a comparison that, regrettably, is not inaccurate. The impact that created it nearly shattered the moon entirely. Apart from this, Mimas is heavily cratered and shows no signs of geological activity, making it one of the most inert bodies in the Solar System.<br><br><a href='https://en.wikipedia.org/wiki/Mimas' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="hyperion" data-title="Hyperion" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Hyperion_true.jpg/960px-Hyperion_true.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>An irregularly shaped moon of Saturn with a sponge-like appearance, Hyperion is one of the most unusual objects in the Solar System - not only in shape, but in how it moves through space.<br><br><b>Distance from Saturn:</b> Orbits at an average of 1,481,000 km, completing one orbit every 21.3 Earth days. Its rotation is chaotic, meaning it tumbles unpredictably rather than maintaining a stable orientation.<br><br><b>Distance from the Sun:</b> Shares Saturn's average distance of 9.58 AU - approximately 1.43 billion kilometres from the Sun.<br><br><b>Size:</b> Approximately 270 × 205 × 163 km - highly irregular in shape rather than spherical.<br><br><b>Composition:</b> A porous mixture of water ice and rock with very low density - suggesting a loosely packed, sponge-like internal structure with significant empty space.<br><br><b>Notable Features:</b> Hyperion's surface is covered in deep, sharp-edged craters that give it a distinctly porous, almost organic appearance. Its chaotic rotation is caused by gravitational interactions with Saturn and nearby Titan, making its orientation impossible to predict over long timescales. Unlike most moons, it does not settle into tidal locking, making it dynamically unique among large satellites.<br><br><a href='https://en.wikipedia.org/wiki/Hyperion_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="phoebe" data-title="Phoebe" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Phoebe_cassini_full.jpg/960px-Phoebe_cassini_full.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>An outer moon of Saturn with a distinctly alien origin, Phoebe is a captured object from the distant outer Solar System, likely related to Kuiper Belt bodies.<br><br><b>Distance from Saturn:</b> Orbits at an average of 12.95 million km, taking about 550 Earth days to complete one orbit. Its orbit is retrograde, moving opposite to Saturn's rotation.<br><br><b>Distance from the Sun:</b> Shares Saturn's average distance of 9.58 AU - approximately 1.43 billion kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 213 km.<br><br><b>Composition:</b> A mixture of rock, ice, and carbon-rich compounds, giving it a very dark surface compared to Saturn's inner moons.<br><br><b>Notable Features:</b> Phoebe's retrograde and highly inclined orbit clearly indicates it did not form with Saturn but was captured by its gravity. Its dark material is thought to contribute to the coating of Iapetus' leading hemisphere. Heavily cratered and irregular, Phoebe provides insight into primitive Solar System material far from the Sun.<br><br><a href='https://en.wikipedia.org/wiki/Phoebe_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="janus" data-title="Janus" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/PIA12714_Janus_crop.jpg/960px-PIA12714_Janus_crop.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A small inner moon of Saturn notable not for its size, but for its unusual orbital relationship with its neighbour Epimetheus - a rare example of co-orbital dynamics.<br><br><b>Distance from Saturn:</b> Orbits at an average of 151,500 km, sharing a nearly identical orbit with Epimetheus, completing one orbit every 0.69 Earth days.<br><br><b>Distance from the Sun:</b> As part of the Saturnian system, it orbits at an average of 9.58 AU - approximately 1.43 billion kilometres from the Sun.<br><br><b>Size:</b> Mean diameter of approximately 179 km.<br><br><b>Composition:</b> Primarily water ice with some rocky material, typical of Saturn's inner moons.<br><br><b>Notable Features:</b> Janus and Epimetheus periodically swap orbital positions every few years in a gravitational interaction that prevents collision - a delicate and stable exchange that is unique among known moons. Its surface is irregular and cratered, reflecting a long history of impacts with little geological change.<br><br><a href='https://en.wikipedia.org/wiki/Janus_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="ganymede" data-title="Ganymede" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Ganymede_-_Perijove_34_Composite.png/960px-Ganymede_-_Perijove_34_Composite.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The largest moon in the Solar System, Ganymede is bigger than the planet Mercury and possesses a level of internal complexity that rivals small planets.<br><br><b>Distance from Jupiter:</b> Orbits at an average of 1,070,400 km, completing one orbit every 7.15 Earth days. It is tidally locked to Jupiter.<br><br><b>Distance from the Sun:</b> As part of the Jovian system, it orbits at an average of 5.2 AU - approximately 778 million kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 5,268 km - the largest moon in the Solar System.<br><br><b>Composition:</b> A differentiated body with a metallic core, rocky mantle, and icy crust. It is the only moon known to generate its own magnetic field.<br><br><b>Notable Features:</b> Ganymede's surface shows a mix of ancient, heavily cratered regions and younger, grooved terrain formed by tectonic activity. Beneath its icy shell, it is believed to host a deep subsurface ocean containing more water than all of Earth's oceans combined. Its magnetic field creates auroras, making it uniquely planet-like among moons.<br><br><a href='https://en.wikipedia.org/wiki/Ganymede_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="callisto" data-title="Callisto" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Callisto_VGR2_C2060635_OGB.png/960px-Callisto_VGR2_C2060635_OGB.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The outermost of Jupiter's four large Galilean moons, Callisto is a heavily cratered and ancient world that has remained largely unchanged for billions of years.<br><br><b>Distance from Jupiter:</b> Orbits at an average of 1,882,700 km, taking 16.69 Earth days to complete one orbit. It is tidally locked to Jupiter.<br><br><b>Distance from the Sun:</b> Shares Jupiter's average distance of 5.2 AU - approximately 778 million kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 4,821 km - the third largest moon in the Solar System.<br><br><b>Composition:</b> A mixture of ice and rock that appears only partially differentiated, with no fully developed core structure.<br><br><b>Notable Features:</b> Callisto's surface is one of the oldest in the Solar System and is covered completely with impact craters. Its most prominent structure is Valhalla, a massive multi-ring impact basin spanning thousands of kilometers. Unlike Ganymede or Europa, Callisto shows little evidence of internal activity, though a subsurface ocean may still exist deep beneath its crust. Its relatively low radiation environment makes it a good candidate for future human exploration.<br><br><a href='https://en.wikipedia.org/wiki/Callisto_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="io" data-title="Io" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Io_highest_resolution_natural_color.png/960px-Io_highest_resolution_natural_color.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The most volcanically active body in the Solar System, Io is a world of constant eruption, reshaping its surface on timescales that would make most planets envious.<br><br><b>Distance from Jupiter:</b> Orbits at an average of 421,700 km, completing one orbit every 1.77 Earth days. It is tidally locked to Jupiter.<br><br><b>Distance from the Sun:</b> As part of the Jovian system, it orbits at an average of 5.2 AU - approximately 778 million kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 3,643 km.<br><br><b>Composition:</b> Primarily rock, with little water ice. Its interior is heated by intense tidal forces from Jupiter and neighbouring moons.<br><br><b>Notable Features:</b> Io's surface is covered in hundreds of active volcanoes, some erupting plumes up to 500 km high. Its vivid colours-yellows, reds, and blacks-come from sulfur and sulfur compounds deposited by constant volcanic activity. The extreme tidal heating prevents impact craters from accumulating, continuously renewing the surface.<br><br><a href='https://en.wikipedia.org/wiki/Io_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="europa" data-title="Europa" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Europa_-_Perijove_45_%28cropped%29.png/960px-Europa_-_Perijove_45_%28cropped%29.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A smooth, ice-covered moon of Jupiter, Europa is one of the most promising places in the Solar System to search for extraterrestrial life.<br><br><b>Distance from Jupiter:</b> Orbits at an average of 670,900 km, completing one orbit every 3.55 Earth days. It is tidally locked to Jupiter.<br><br><b>Distance from the Sun:</b> Shares Jupiter's average distance of 5.2 AU - approximately 778 million kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 3,122 km.<br><br><b>Composition:</b> A rocky interior covered by a thick shell of water ice. Beneath this crust lies a global subsurface ocean of liquid water.<br><br><b>Notable Features:</b> Europa's surface is remarkably smooth, with few craters and a network of dark streaks and fractures caused by tidal flexing. Evidence suggests that its subsurface ocean may contain more than twice the volume of Earth's oceans. Interaction between water and rock on the ocean floor could provide the chemical energy necessary for life, making Europa a prime target for future exploration missions.<br><br><a href='https://en.wikipedia.org/wiki/Europa_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="amalthea" data-title="Amalthea" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Amalthea_PIA02532.png/330px-Amalthea_PIA02532.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A small, irregularly shaped inner moon of Jupiter, Amalthea orbits deep within the planet's intense radiation environment.<br><br><b>Distance from Jupiter:</b> Orbits at an average of 181,400 km, completing one orbit every 0.50 Earth days - about 12 hours.<br><br><b>Distance from the Sun:</b> As part of the Jovian system, it orbits at an average of 5.2 AU - approximately 778 million kilometres from the Sun.<br><br><b>Size:</b> Approximately 250 × 146 × 128 km - irregular in shape rather than spherical.<br><br><b>Composition:</b> Likely composed of porous water ice mixed with darker material, despite its proximity to Jupiter where such ice might be expected to sublimate.<br><br><b>Notable Features:</b> Amalthea has an uneven, heavily cratered surface with large depressions and ridges. Its low density suggests it may be a loosely bound “rubble pile.” It also contributes material to Jupiter's faint ring system, shedding dust due to micrometeorite impacts.<br><br><a href='https://en.wikipedia.org/wiki/Amalthea_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="himalia" data-title="Himalia" data-desc="<br>The largest of Jupiter's irregular outer moons, Himalia is part of a distant group of satellites believed to have originated from a captured asteroid.<br><br><b>Distance from Jupiter:</b> Orbits at an average of approximately 11.5 million km, taking about 250 Earth days to complete one orbit. Its orbit is inclined and slightly eccentric.<br><br><b>Distance from the Sun:</b> Shares Jupiter's average distance of 5.2 AU - approximately 778 million kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 170 km.<br><br><b>Composition:</b> Likely composed of rock and ice with a dark surface, similar to C-type asteroids.<br><br><b>Notable Features:</b> Himalia is the largest member of the Himalia group, a family of moons with similar orbits that likely formed from the fragmentation of a single captured body. Its irregular shape and distant orbit distinguish it from Jupiter's larger, more regular moons.<br><br><a href='https://en.wikipedia.org/wiki/Himalia_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="thebe" data-title="Thebe" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/1/1b/Thebe.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>An inner moon of Jupiter, Thebe orbits just beyond Amalthea and shares a similarly irregular shape and darkened surface.<br><br><b>Distance from Jupiter:</b> Orbits at an average of 221,900 km, completing one orbit every 0.67 Earth days - roughly 16 hours.<br><br><b>Distance from the Sun:</b> As part of the Jovian system, it orbits at an average of 5.2 AU - approximately 778 million kilometres from the Sun.<br><br><b>Size:</b> Approximately 116 × 98 × 84 km - irregular and non-spherical.<br><br><b>Composition:</b> Likely composed of porous ice mixed with darker rocky material, with a low density suggesting a loosely consolidated structure.<br><br><b>Notable Features:</b> Thebe's surface is heavily cratered, with large impact features relative to its size. Like Amalthea, it contributes dust to Jupiter's faint ring system, forming part of the Thebe ring. Its proximity to Jupiter subjects it to strong tidal forces and intense radiation.<br><br><a href='https://en.wikipedia.org/wiki/Thebe_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="elara" data-title="Elara" data-desc="<br>One of Jupiter's larger irregular outer moons, Elara is part of a distant group of satellites that likely originated from a captured and fragmented parent body.<br><br><b>Distance from Jupiter:</b> Orbits at an average of approximately 11.7 million km, taking about 259 Earth days to complete one orbit. Its orbit is inclined and slightly eccentric.<br><br><b>Distance from the Sun:</b> Shares Jupiter's average distance of 5.2 AU - approximately 778 million kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 86 km.<br><br><b>Composition:</b> Likely composed of rock and ice with a dark, non-reflective surface, similar to other irregular moons.<br><br><b>Notable Features:</b> Elara belongs to the Himalia group, a cluster of moons with similar orbital characteristics, suggesting a common origin from a captured asteroid that later fragmented. Its distant orbit places it far from Jupiter's regular moon system, in a dynamically complex region.<br><br><a href='https://en.wikipedia.org/wiki/Elara_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="metis" data-title="Metis" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/9/9a/Metis.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The innermost known moon of Jupiter, Metis orbits extremely close to the planet, within a region dominated by strong tidal forces.<br><br><b>Distance from Jupiter:</b> Orbits at an average of 128,000 km, completing one orbit every 0.29 Earth days - about 7 hours.<br><br><b>Distance from the Sun:</b> As part of the Jovian system, it orbits at an average of 5.2 AU - approximately 778 million kilometres from the Sun.<br><br><b>Size:</b> Approximately 60 × 40 × 34 km - highly irregular in shape.<br><br><b>Composition:</b> Likely composed of porous rock and ice, though its proximity to Jupiter raises questions about long-term stability.<br><br><b>Notable Features:</b> Metis orbits within Jupiter's main ring and is a primary source of ring material, shedding dust due to constant micrometeorite impacts. Its orbit lies close to Jupiter's Roche limit, where tidal forces could potentially disrupt loosely bound bodies. Despite this, it remains intact - for now.<br><br><a href='https://en.wikipedia.org/wiki/Metis_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="adrastea" data-title="Adrastea" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/e/e4/Adrastea.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>A tiny inner moon of Jupiter, Adrastea is one of the smallest known moons in the Solar System and orbits extremely close to the planet.<br><br><b>Distance from Jupiter:</b> Orbits at an average of 129,000 km, completing one orbit every 0.30 Earth days - just over 7 hours.<br><br><b>Distance from the Sun:</b> Shares Jupiter's average distance of 5.2 AU - approximately 778 million kilometres from the Sun.<br><br><b>Size:</b> Estimated dimensions of approximately 20 × 16 × 14 km - irregular and very small.<br><br><b>Composition:</b> Likely composed of rock and ice, with a darkened surface due to space weathering.<br><br><b>Notable Features:</b> Adrastea orbits within Jupiter's main ring and contributes material to it, similar to Metis. Its extremely close orbit places it deep within Jupiter's gravitational and radiation environment. It was one of the first moons discovered by spacecraft rather than Earth-based observation, identified in images from Voyager 2.<br><br><a href='https://en.wikipedia.org/wiki/Adrastea_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="ceres" data-title="Ceres" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/7/76/Ceres_-_RC3_-_Haulani_Crater_%2822381131691%29_%28cropped%29.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The largest object in the asteroid belt and the only one classified as a dwarf planet, Ceres represents a transitional world between rocky asteroids and icy bodies of the outer Solar System.<br><br><b>Distance from the Sun:</b> Orbits at an average of 2.77 AU - approximately 414 million kilometres from the Sun.<br><br><b>Orbital Period:</b> One Ceres year lasts about 4.6 Earth years.<br><br><b>Size:</b> Diameter of approximately 940 km - accounting for about one-third of the total mass of the asteroid belt.<br><br><b>Composition:</b> A mixture of rock and water ice, with evidence of hydrated minerals and possibly a subsurface briny layer.<br><br><b>Notable Features:</b> Ceres displays evidence of a surprisingly complex and active history for its size. Its interior likely consists of a rocky core or muddy mantle beneath an ice–salt–clay crust, with water ice making up an estimated 25–30% of its volume. Bright deposits in Occator Crater, including Cerealia and Vinalia Faculae, are composed of sodium salts left behind by briny water reaching the surface. The dwarf planet also hosts Ahuna Mons, a geologically young cryovolcano, along with other cryovolcanic domes that have gradually relaxed over time.<br><br>Organic compounds have been detected on the surface, particularly near Ernutet Crater, suggesting a carbon-rich composition. Ceres possesses a transient water-vapour exosphere, likely generated by sublimation or low-level venting. Altogether, features such as brine migration, surface relaxation, and cryovolcanism indicate that Ceres remained geologically active far longer than expected for a body of its size.<br><br><a href='https://en.wikipedia.org/wiki/Ceres_(dwarf_planet)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="vesta" data-title="Vesta" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Vesta_in_natural_color.jpg/960px-Vesta_in_natural_color.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The second most massive object in the asteroid belt, Vesta is a protoplanet - a body that began forming into a planet but never completed the process.<br><br><b>Distance from the Sun:</b> Orbits at an average of 2.36 AU - approximately 353 million kilometres from the Sun.<br><br><b>Orbital Period:</b> One Vesta year lasts about 3.63 Earth years.<br><br><b>Size:</b> Mean diameter of approximately 525 km.<br><br><b>Composition:</b> Differentiated into a crust, mantle, and core - similar to terrestrial planets. Its surface is primarily basaltic rock, indicating past volcanic activity.<br><br><b>Notable Features:</b> Vesta hosts one of the largest impact basins in the Solar System, Rheasilvia, at its south pole, with a central peak rising about 22 kilometers high. Many meteorites found on Earth are believed to come from Vesta, linking it directly to the study of planetary geology. It was also visited by the Dawn spacecraft, which revealed a complex and geologically evolved body.<br><br><a href='https://en.wikipedia.org/wiki/Vesta_(asteroid)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="pallas" data-title="Pallas" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/d/d4/Potw1749a_Pallas_crop.png' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>One of the largest objects in the asteroid belt, Pallas follows an unusually inclined orbit, making it dynamically distinct from many of its neighbours.<br><br><b>Distance from the Sun:</b> Orbits at an average of 2.77 AU - approximately 414 million kilometres from the Sun, similar to Ceres but on a much steeper orbital path.<br><br><b>Orbital Period:</b> One Pallas year lasts about 4.6 Earth years.<br><br><b>Size:</b> Mean diameter of approximately 512 km.<br><br><b>Composition:</b> Likely composed of silicate rock with some water-bearing minerals, though it appears less differentiated than Vesta.<br><br><b>Notable Features:</b> Pallas' orbit is highly inclined (about 34 degrees), making it one of the most tilted large bodies in the Solar System. Its surface is heavily cratered and relatively poorly studied compared to Ceres and Vesta, as no spacecraft has visited it. Its unusual orbit suggests a more chaotic early history within the asteroid belt.<br><br><a href='https://en.wikipedia.org/wiki/2_Pallas' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="hygiea" data-title="Hygiea" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/SPHERE_image_of_Hygiea.jpg/960px-SPHERE_image_of_Hygiea.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The fourth largest object in the asteroid belt, Hygiea is a dark and relatively low-density body that may qualify as a dwarf planet due to its nearly spherical shape.<br><br><b>Distance from the Sun:</b> Orbits at an average of 3.14 AU - approximately 470 million kilometres from the Sun.<br><br><b>Orbital Period:</b> One Hygiea year lasts about 5.57 Earth years.<br><br><b>Size:</b> Mean diameter of approximately 434 km.<br><br><b>Composition:</b> Likely composed of carbon-rich material mixed with water-bearing minerals, giving it a very dark surface.<br><br><b>Notable Features:</b> Observations suggest Hygiea has a surprisingly spherical shape for its size, raising the possibility that it meets the criteria for dwarf planet status. It appears to have been heavily disrupted by a past collision and may be the largest remnant of a once larger parent body. It is the dominant member of the Hygiea asteroid family.<br><br><a href='https://en.wikipedia.org/wiki/10_Hygiea' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="phobos" data-title="Phobos" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Phobos_colour_2008.jpg/960px-Phobos_colour_2008.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The larger and innermost of Mars' two moons, Phobos is a small, irregularly shaped body that orbits so close to its planet that it rises and sets multiple times each Martian day.<br><br><b>Distance from Mars:</b> Orbits at an average of 6,000 km, completing one orbit every 7 hours and 39 minutes - faster than Mars rotates.<br><br><b>Distance from the Sun:</b> As part of the Martian system, it orbits at an average of 1.52 AU - approximately 228 million kilometres from the Sun.<br><br><b>Size:</b> Approximately 27 × 22 × 18 km - irregular in shape.<br><br><b>Composition:</b> Likely composed of carbon-rich rock mixed with ice, similar to C-type asteroids, though its exact origin remains debated.<br><br><b>Notable Features:</b> Phobos is dominated by the massive Stickney crater, nearly half the moon's diameter, along with grooves and fractures likely caused by past impacts and tidal stresses. Its orbit is gradually decaying due to tidal interactions with Mars, and it is expected to either break apart into a ring or impact the planet within tens of millions of years.<br><br><a href='https://en.wikipedia.org/wiki/Phobos_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="deimos" data-title="Deimos" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/8/86/NASA-Deimos-MarsMoon-20090221.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The smaller and outermost moon of Mars, Deimos is smoother and more rounded than Phobos, with fewer large craters and a more subdued appearance.<br><br><b>Distance from Mars:</b> Orbits at an average of 23,500 km, completing one orbit every 30.3 hours.<br><br><b>Distance from the Sun:</b> Shares Mars' average distance of 1.52 AU - approximately 228 million kilometres from the Sun.<br><br><b>Size:</b> Approximately 15 × 12 × 11 km - small and irregular, though more rounded than Phobos.<br><br><b>Composition:</b> Likely composed of porous rock and ice, similar to Phobos, with a surface covered in a thick layer of regolith that has softened its features.<br><br><b>Notable Features:</b> Deimos has far fewer large craters than Phobos, likely due to surface material gradually smoothing over impacts. Its origin remains uncertain, with theories ranging from captured asteroid to formation from debris around Mars. Its relatively stable orbit contrasts with the slow inward spiral of Phobos.<br><br><a href='https://en.wikipedia.org/wiki/Deimos_(moon)' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="themoon" data-title="The Moon" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/960px-FullMoon2010.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>Earth's only natural satellite, the Moon is the fifth largest moon in the Solar System and the only extraterrestrial body ever visited by humans.<br><br><b>Distance from Earth:</b> Orbits at an average of 384,400 km, completing one orbit every 27.3 days. Its rotation is tidally locked, always showing the same face to Earth.<br><br><b>Distance from the Sun:</b> As part of the Earth system, it orbits at an average of 1 AU - approximately 150 million kilometres from the Sun.<br><br><b>Size:</b> Diameter of approximately 3,474 km.<br><br><b>Composition:</b> A differentiated body with a small core, rocky mantle, and crust composed largely of silicate minerals. The surface is covered in regolith formed by billions of years of impacts.<br><br><b>Notable Features:</b> The Moon's surface is divided into bright highlands and darker basaltic plains known as maria, formed by ancient volcanic activity. It likely formed following a massive collision between the early Earth and a Mars-sized body, with debris coalescing into the Moon. Its gravitational influence stabilizes Earth's axial tilt and drives ocean tides. Human missions during the Apollo program (1969–1972) returned samples and transformed our understanding of planetary formation.<br><br><a href='https://en.wikipedia.org/wiki/Moon' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="system" data-title="The Solar System" data-desc="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Solar_System_true_color_%28captions%29.jpg/960px-Solar_System_true_color_%28captions%29.jpg' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The Solar System is a gravitationally bound system centered on the Sun, consisting of planets, moons, dwarf planets, asteroids, comets, and vast populations of smaller objects - all formed approximately 4.6 billion years ago from a collapsing cloud of gas and dust.<br><br><b>Structure:</b> The system is broadly divided into regions: the inner rocky planets (Mercury, Venus, Earth, Mars), the asteroid belt, the gas and ice giants (Jupiter, Saturn, Uranus, Neptune), the Kuiper Belt, and the distant, spherical Oort Cloud. Each region reflects differences in temperature and material during formation.<br><br><b>Scale:</b> The Solar System spans billions of kilometres. Neptune orbits at about 30 AU (4.5 billion kilometres), while the Oort Cloud may extend up to 100,000 AU - nearly 1.5 light-years - placing its outer boundary closer to neighbouring stars than to the Sun itself.<br><br><b>Composition:</b> About 99.8% of the system's total mass resides in the Sun. The remaining fraction forms planets and smaller bodies composed of rock, metal, ice, and gas, with increasing ice content further from the Sun.<br><br><b>Dynamics:</b> Most objects orbit in the same plane and direction, a remnant of the original rotating protoplanetary disk. Gravitational interactions, particularly with giant planets like Jupiter, continue to shape the system by capturing, ejecting, or perturbing smaller bodies.<br><br><b>Notable Features:</b> The Solar System contains a diverse range of worlds - from volcanic Io and ocean-bearing Europa to the methane lakes of Titan and the icy dwarf planets beyond Neptune. It is also the only known system to host life, with Earth providing the necessary conditions for its emergence. Ongoing exploration continues to reveal a far more dynamic and complex system than once imagined.<br><br><a href='https://en.wikipedia.org/wiki/Solar_System' target='_blank'>Wikipedia</a>"></div>
+
+            <div class="hotspot" id="aboutCZ" data-title="About" data-desc="<img src='https://lh3.googleusercontent.com/u/0/d/15tA-jNLkgXiow4OTe9aKOVwlp3zrLUxi' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>Sluneční soustava slouží jako interaktivní vzdělávací průvodce naším kosmickým sousedstvím.<br><br>Projekt vytvořil Josef Handsuch v květnu roku 2026 s využitím programů VSCodium a Photoshop, materiálů z Wikipedie a za asistence umělé inteligence Gemini a Claude. Tato aplikace představuje osobní závazek ke vzdělávání v oblasti astronomie.<br>"></div>
+
+            <div class="hotspot" id="about" data-title="About" data-desc="<img src='https://lh3.googleusercontent.com/u/0/d/15tA-jNLkgXiow4OTe9aKOVwlp3zrLUxi' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br>The Solar System serves as an interactive educational guide to our cosmic neighborhood.<br><br>Developed between May and June 2026 by Josef Handsuch, the project utilizes VSCodium, Photoshop, and Wikipedia, alongside AI assistance from Gemini and Claude. This application represents a personal commitment to astronomy education."></div>
+
+            <div class="hotspot" id="projects" data-title="Other projects" data-desc="<img src='https://lh3.googleusercontent.com/u/0/d/15tA-jNLkgXiow4OTe9aKOVwlp3zrLUxi' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br><a href='https://aporuelab.github.io/earth-chronicle'>The Earth Chronicle</a><br>An interactive geologic time scale of Earth"></div>
+
+            <div class="hotspot" id="language" data-title="Česká verze" data-desc="<img src='https://lh3.googleusercontent.com/u/0/d/1DxNidozMuQLh0gnFaa2l_0GfoSt0e7jt' style='width:85%; display:block; margin:12px auto 12px auto; border-radius:6px;'><br><a href='https://aporuelab.github.io/solar-system/cz.html'>PŘEPNOUT</a>"></div>
+
+
+        </div>
+    </div>
+
+    <div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9998;"></div>
+    <div class="tooltip" id="info-bubble">
+        <div class="tooltip-content">
+            <h3 id="bubble-title">Title</h3>
+            <p id="bubble-desc">Description goes here.</p>
+        </div>
+        <div class="tooltip-footer">
+            <button id="close-btn">Close</button>
+        </div>
+    </div>
+
+    <!-- BOOKMARK: Script  -->
+    <script>
+        window.addEventListener('load', function () {
+            const hotspots = document.querySelectorAll('.hotspot');
+            hotspots.forEach(spot => {
+                const desc = spot.getAttribute('data-desc');
+                const match = desc.match(/src=['"]([^'"]+)['"]/);
+                if (match && match[1]) {
+                    const preloadImg = new Image();
+                    preloadImg.src = match[1];
+                }
+            });
+        });
+
+        const hotspots = document.querySelectorAll('.hotspot');
+        const bubble = document.getElementById('info-bubble');
+        const bubbleTitle = document.getElementById('bubble-title');
+        const bubbleDesc = document.getElementById('bubble-desc');
+        const closeBtn = document.getElementById('close-btn');
+
+        function preventBodyTouch(e) {
+            if (!bubble.contains(e.target)) {
+                e.preventDefault();
+            }
+        }
+
+        function openBubble() {
+            document.getElementById('overlay').style.display = 'block';
+            bubble.style.display = 'flex';
+            document.addEventListener('touchmove', preventBodyTouch, { passive: false });
+            positionBubble();
+        }
+
+        function positionBubble() {
+            if (window.visualViewport) {
+                const vv = window.visualViewport;
+                const scale = 1 / vv.scale;
+                bubble.style.position = 'fixed';
+                bubble.style.top = (vv.offsetTop + vv.height / 2) + 'px';
+                bubble.style.left = (vv.offsetLeft + vv.width / 2) + 'px';
+                bubble.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                bubble.style.transformOrigin = 'center center';
+            }
+        }
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('scroll', () => {
+                if (bubble.style.display === 'flex') positionBubble();
+            });
+            window.visualViewport.addEventListener('resize', () => {
+                if (bubble.style.display === 'flex') positionBubble();
+            });
+        }
+
+        function closeBubble() {
+            bubble.style.display = 'none';
+            bubble.style.transform = 'translate(-50%, -50%)';
+            document.getElementById('overlay').style.display = 'none';
+            document.body.style.overflow = '';
+            document.removeEventListener('touchmove', preventBodyTouch);
+        }
+
+
+        hotspots.forEach(spot => {
+            spot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                bubbleTitle.textContent = spot.getAttribute('data-title');
+                bubbleDesc.innerHTML = spot.getAttribute('data-desc');
+                openBubble();
+            });
+        });
+
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeBubble();
+        });
+
+        document.addEventListener('click', (e) => {
+            const isClickInsideBubble = bubble.contains(e.target);
+            const isClickOnHotspot = Array.from(hotspots).some(spot => spot.contains(e.target));
+            if (!isClickInsideBubble && !isClickOnHotspot) {
+                closeBubble();
+            }
+        });
+
+        function positionHeader() {
+            if (window.visualViewport) {
+                const vv = window.visualViewport;
+                const header = document.getElementById('fixed-header');
+                header.style.top = vv.offsetTop + 'px';
+                header.style.left = vv.offsetLeft + 'px';
+                header.style.width = vv.width + 'px';
+
+                // Counteract zoom
+                const scale = 1 / vv.scale;
+                header.style.transformOrigin = 'top left';
+                header.style.transform = `scale(${scale})`;
+                header.style.width = (vv.width * vv.scale) + 'px';
+
+                document.getElementById('header-spacer').style.height = header.offsetHeight + 'px';
+            }
+        }
+
+        positionHeader();
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('scroll', positionHeader);
+            window.visualViewport.addEventListener('resize', positionHeader);
+        }
+
+        window.addEventListener('load', function () {
+            const hotspots = document.querySelectorAll('.hotspot');
+            hotspots.forEach(spot => {
+                const desc = spot.getAttribute('data-desc');
+                const match = desc.match(/src=['"]([^'"]+)['"]/);
+                if (match && match[1]) {
+                    const preloadImg = new Image();
+                    preloadImg.src = match[1];
+                }
+            });
+        });
+
+
+
+    </script>
+
+</body>
+
+</html>
