@@ -20,15 +20,16 @@
 
         html, body {
             height: 100%;
-            overflow: hidden;
-            overscroll-behavior: none;
+            overflow-x: hidden;
+            overflow-y: auto;
             color-scheme: dark;
         }
-
-        #overlay {
-            background-color: rgba(0, 0, 0, 0.9);
-            transition: opacity 0.9s ease;
-        }
+		
+		#overlay {
+			background-color: rgba(0, 0, 0, 0.9);
+			transition: opacity 0.2s ease;
+            touch-action: none;
+		}
 
         .main-title {
             color: bisque;
@@ -137,13 +138,10 @@
         }
 
         #scroll-wrapper {
-            width: 100%;
-            padding-bottom: 40px;
-            padding-top: 0;
-            overflow: auto;
             width: 200vw;
-            height: 100vh;
-            overscroll-behavior: contain;
+            overflow-x: auto;
+            overflow-y: visible; /* IMPORTANT */
+            padding-bottom: 40px;
         }
 
         #fixed-header {
@@ -909,16 +907,10 @@
         const bubbleDesc = document.getElementById('bubble-desc');
         const closeBtn = document.getElementById('close-btn');
 
-        function preventBodyTouch(e) {
-            if (!bubble.contains(e.target)) {
-                e.preventDefault();
-            }
-        }
 
         function openBubble() {
             document.getElementById('overlay').style.display = 'block';
             bubble.style.display = 'flex';
-            document.addEventListener('touchmove', preventBodyTouch, { passive: false });
             positionBubble();
         }
 
