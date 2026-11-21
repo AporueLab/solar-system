@@ -18,10 +18,18 @@
             overflow-x: auto;
         }
 
-        #overlay {
-            background-color: rgba(0, 0, 0, 0.9);
-            transition: opacity 0.9s ease;
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            color-scheme: dark;
         }
+		
+		#overlay {
+			background-color: rgba(0, 0, 0, 0.9);
+			transition: opacity 0.2s ease;
+            touch-action: none;
+		}
 
         .main-title {
             color: bisque;
@@ -130,9 +138,10 @@
         }
 
         #scroll-wrapper {
-            width: 100%;
+            width: 200vw;
+            overflow-x: auto;
+            overflow-y: visible; /* IMPORTANT */
             padding-bottom: 40px;
-            padding-top: 0;
         }
 
         #fixed-header {
@@ -214,7 +223,7 @@
             .image-container {
                 display: inline-block;
                 position: relative;
-                top: -30px;
+                top: -15px;
                 margin: 0;
                 width: 200vw;
             }
@@ -898,16 +907,10 @@
         const bubbleDesc = document.getElementById('bubble-desc');
         const closeBtn = document.getElementById('close-btn');
 
-        function preventBodyTouch(e) {
-            if (!bubble.contains(e.target)) {
-                e.preventDefault();
-            }
-        }
 
         function openBubble() {
             document.getElementById('overlay').style.display = 'block';
             bubble.style.display = 'flex';
-            document.addEventListener('touchmove', preventBodyTouch, { passive: false });
             positionBubble();
         }
 
@@ -937,7 +940,6 @@
             bubble.style.transform = 'translate(-50%, -50%)';
             document.getElementById('overlay').style.display = 'none';
             document.body.style.overflow = '';
-            document.removeEventListener('touchmove', preventBodyTouch);
         }
 
 
