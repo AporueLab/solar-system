@@ -759,6 +759,23 @@
             padding: 9px 17px; font-weight: bold; cursor: pointer; }
 
 
+        /* Difficulty chooser — same understated dark style as the quiz. */
+        #quiz-mode-chooser[hidden], #quiz-back[hidden],
+        #quiz-progress[hidden], #quiz-question[hidden],
+        #quiz-options[hidden], #quiz-feedback[hidden] { display: none !important; }
+        #quiz-choose-label { color: #ddd; margin: 0 0 12px; font-size: .95rem; }
+        #quiz-modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+        .quiz-mode { border: 1px solid #595959; background: #303030; color: #eee;
+            border-radius: 9px; min-height: 78px; padding: 12px 10px;
+            cursor: pointer; text-align: center; }
+        .quiz-mode:hover, .quiz-mode:focus-visible { border-color: #d4b17d; background: #3b352c; }
+        .quiz-mode strong { display: block; font-size: .85rem; letter-spacing: .6px; color: bisque; }
+        .quiz-mode small { display: block; margin-top: 7px; color: #aaa; line-height: 1.35; }
+        #quiz-back { align-self: flex-start; margin-top: 5px; padding: 8px 0;
+            border: 0; border-bottom: 1px dotted #999; background: transparent;
+            color: #bbb; cursor: pointer; font-size: .8rem; }
+        #quiz-back:hover { color: bisque; }
+        @media (max-width: 360px) { #quiz-modes { grid-template-columns: 1fr; } }
     </style>
 </head>
 
@@ -931,10 +948,15 @@
     <section id="quiz-dialog" role="dialog" aria-modal="true" aria-labelledby="quiz-heading" tabindex="-1">
         <button id="quiz-x" type="button" aria-label="Zavřít kvíz">×</button>
         <h2 id="quiz-heading">Kvíz: Sluneční soustava</h2>
+        <div id="quiz-mode-chooser" hidden>
+            <p id="quiz-choose-label">Zvolte obtížnost</p>
+            <div id="quiz-modes"></div>
+        </div>
         <div id="quiz-progress"></div>
         <p id="quiz-question"></p>
         <div id="quiz-options"></div>
         <p id="quiz-feedback" aria-live="polite"></p>
+        <button id="quiz-back" type="button" hidden>ZMĚNIT OBTÍŽNOST</button>
         <button id="quiz-next" type="button">DALŠÍ</button>
     </section>
 
@@ -1084,9 +1106,11 @@
                 }
                 return a;
             }
-            function selectRound() {
+            function selectRound(mode) {
                 const used = new Set(recent.flat());
-                const distribution = [['intermediate', 3], ['advanced', 5], ['expert', 2]];
+                const distribution = mode === 'mixed'
+                    ? [['intermediate', 3], ['advanced', 5], ['expert', 2]]
+                    : [[mode, 10]];
                 const chosen = [];
                 for (const [tier, n] of distribution) {
                     const candidates = bank.map((q, i) => ({ q, i })).filter(({ q }) => q[4] === tier);
@@ -1098,6 +1122,41 @@
                 recent = recent.slice(-3);
                 try { sessionStorage.setItem(historyKey, JSON.stringify(recent)); } catch (_) {}
                 return shuffle(chosen.map(({ q }) => q));
+            }
+            const modeChooser = document.getElementById('quiz-mode-chooser');
+            const modeButtons = document.getElementById('quiz-modes');
+            const backButton = document.getElementById('quiz-back');
+            let currentMode = 'mixed';
+            function chooseMode() {
+                modeChooser.hidden = false;
+                progress.hidden = true;
+                question.hidden = true;
+                choices.hidden = true;
+                feedback.hidden = true;
+                next.style.display = 'none';
+                backButton.hidden = true;
+                modeButtons.replaceChildren();
+                const modes = [["intermediate","STŘEDNÍ","Základní znalosti"],["advanced","POKROČILÁ","Hlubší znalosti"],["expert","EXPERTNÍ","Nejtěžší otázky"],["mixed","SMÍŠENÁ","3 střední · 5 pokročilých · 2 expertní"]];
+                modes.forEach(([id, title, detail]) => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'quiz-mode';
+                    const name = document.createElement('strong');
+                    name.textContent = title;
+                    const subtitle = document.createElement('small');
+                    subtitle.textContent = detail;
+                    button.append(name, subtitle);
+                    button.addEventListener('click', () => start(id));
+                    modeButtons.appendChild(button);
+                });
+            }
+            function showQuizContent() {
+                modeChooser.hidden = true;
+                progress.hidden = false;
+                question.hidden = false;
+                choices.hidden = false;
+                feedback.hidden = false;
+                backButton.hidden = false;
             }
             function position() {
                 if (!window.visualViewport) return;
@@ -1139,9 +1198,11 @@
                 next.style.display = 'block';
                 next.textContent = at === round.length - 1 ? strings.results : strings.next;
             }
-            function start() {
-                round = selectRound();
+            function start(mode) {
+                currentMode = mode;
+                round = selectRound(mode);
                 at = 0; score = 0; completed = false;
+                showQuizContent();
                 showQuestion();
                 dialog.style.display = 'flex';
                 overlay.style.display = 'block';
@@ -1161,11 +1222,19 @@
                 overlay.style.display = 'none';
                 launch.focus();
             }
-            launch.addEventListener('click', (e) => { e.stopPropagation(); start(); });
+            launch.addEventListener('click', (e) => {
+                e.stopPropagation();
+                chooseMode();
+                dialog.style.display = 'flex';
+                overlay.style.display = 'block';
+                position();
+                dialog.focus();
+            });
+            backButton.addEventListener('click', chooseMode);
             dialog.addEventListener('click', e => e.stopPropagation());
             exit.addEventListener('click', close);
             next.addEventListener('click', () => {
-                if (completed) { start(); return; }
+                if (completed) { start(currentMode); return; }
                 if (at === round.length - 1) { completed = true; finish(); return; }
                 at++;
                 showQuestion();
