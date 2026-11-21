@@ -740,6 +740,10 @@
             box-shadow: 0 10px 35px #000;
             padding: 18px; text-align: left;
         }
+        /* Keep variable-length explanations at their natural height.
+           Scroll the dialog rather than shrinking text into the footer controls. */
+        #quiz-dialog > * { flex-shrink: 0; }
+        #quiz-feedback { overflow-wrap: anywhere; }
         #quiz-dialog h2 { color: bisque; font-size: 1.2rem; margin: 0 40px 16px 0; }
         #quiz-x { position: absolute; right: 12px; top: 9px; border: 0;
             background: transparent; color: #eee; font-size: 24px; cursor: pointer; }
