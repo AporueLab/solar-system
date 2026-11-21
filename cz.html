@@ -779,6 +779,14 @@
             border: 0; border-bottom: 1px dotted #999; background: transparent;
             color: #bbb; cursor: pointer; font-size: .8rem; }
         #quiz-back:hover { color: bisque; }
+        #quiz-actions {
+            display: flex; flex: 0 0 auto; align-items: center;
+            justify-content: space-between; gap: 12px; width: 100%;
+            box-sizing: border-box;
+        }
+        #quiz-back { min-width: 0; text-align: left; }
+        #quiz-next { flex-shrink: 0; margin-left: auto; }
+
         @media (max-width: 360px) { #quiz-modes { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -960,8 +968,10 @@
         <p id="quiz-question"></p>
         <div id="quiz-options"></div>
         <p id="quiz-feedback" aria-live="polite"></p>
-        <button id="quiz-back" type="button" hidden>ZMĚNIT OBTÍŽNOST</button>
-        <button id="quiz-next" type="button">DALŠÍ</button>
+        <div id="quiz-actions">
+            <button id="quiz-back" type="button" hidden>ZMĚNIT OBTÍŽNOST</button>
+            <button id="quiz-next" type="button">DALŠÍ</button>
+        </div>
     </section>
 
     <!-- BOOKMARK: Script  -->
