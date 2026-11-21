@@ -1121,22 +1121,50 @@
                 }
                 return a;
             }
+            // Keep a per-difficulty shuffle bag for the browser-tab session.
+            // Each question is seen once before that tier's pool is recycled.
+            const seenKey = historyKey + '-seen';
+            let seenByTier = {};
+            try {
+                const saved = JSON.parse(sessionStorage.getItem(seenKey) || '{}');
+                if (saved && typeof saved === 'object' && !Array.isArray(saved)) seenByTier = saved;
+            } catch (_) { /* Storage may be disabled. */ }
             function selectRound(mode) {
-                const used = new Set(recent.flat());
+                const lastUsed = new Set(recent.flat());
                 const distribution = mode === 'mixed'
                     ? [['intermediate', 3], ['advanced', 5], ['expert', 2]]
                     : [[mode, 10]];
-                const chosen = [];
+                const selected = [];
                 for (const [tier, n] of distribution) {
                     const candidates = bank.map((q, i) => ({ q, i })).filter(({ q }) => q[4] === tier);
-                    const fresh = shuffle(candidates.filter(({ i }) => !used.has(i)));
-                    const recycled = shuffle(candidates.filter(({ i }) => used.has(i)));
-                    chosen.push(...fresh.concat(recycled).slice(0, n));
+                    const alreadySeen = new Set(Array.isArray(seenByTier[tier]) ? seenByTier[tier] : []);
+                    const fresh = shuffle(candidates.filter(({ i }) => !alreadySeen.has(i)));
+                    const picks = fresh.slice(0, n);
+                    if (picks.length < n) {
+                        // The shuffle bag is exhausted; refill, avoiding recent rounds if possible.
+                        const pickedIds = new Set(picks.map(({ i }) => i));
+                        const remaining = candidates.filter(({ i }) => !pickedIds.has(i));
+                        const preferred = shuffle(remaining.filter(({ i }) => !lastUsed.has(i)));
+                        const fallback = shuffle(remaining.filter(({ i }) => lastUsed.has(i)));
+                        picks.push(...preferred.concat(fallback).slice(0, n - picks.length));
+                        seenByTier[tier] = [];
+                    }
+                    seenByTier[tier] = [...new Set([...(seenByTier[tier] || []), ...picks.map(({ i }) => i)])];
+                    selected.push(...picks);
                 }
-                recent.push(chosen.map(({ i }) => i));
+                recent.push(selected.map(({ i }) => i));
                 recent = recent.slice(-3);
-                try { sessionStorage.setItem(historyKey, JSON.stringify(recent)); } catch (_) {}
-                return shuffle(chosen.map(({ q }) => q));
+                try {
+                    sessionStorage.setItem(historyKey, JSON.stringify(recent));
+                    sessionStorage.setItem(seenKey, JSON.stringify(seenByTier));
+                } catch (_) {}
+                // Randomise both question order and answer order, updating the answer key.
+                return shuffle(selected.map(({ q }) => {
+                    const options = shuffle(q[1].map((label, originalIndex) => ({ label, originalIndex })));
+                    return [q[0], options.map(({ label }) => label),
+                        options.findIndex(({ originalIndex }) => originalIndex === q[2]),
+                        q[3], q[4]];
+                }));
             }
             const modeChooser = document.getElementById('quiz-mode-chooser');
             const modeButtons = document.getElementById('quiz-modes');
