@@ -719,6 +719,47 @@
             width: 6%;
             height: 2%;
         }
+
+        /* Quiz entry stays within the fixed header, never over the infographic. */
+        #quiz-launch {
+            position: absolute; right: 16px; bottom: 9px;
+            border: 1px solid #d4b17d; border-radius: 7px;
+            background: rgba(48, 38, 23, .75); color: #ffe5b9;
+            padding: 5px 11px; font: 700 11px/1.2 sans-serif;
+            letter-spacing: .8px; cursor: pointer;
+        }
+        #quiz-launch:hover, #quiz-launch:focus-visible { background: #554124; outline-offset: 2px; }
+        #quiz-dialog {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); z-index: 9999;
+            box-sizing: border-box; width: min(94vw, 490px); max-height: 85dvh;
+            overflow-y: auto; flex-direction: column;
+            color: #e8e8e8; background: #202020;
+            border: 1px solid #666; border-radius: 14px;
+            box-shadow: 0 10px 35px #000;
+            padding: 18px; text-align: left;
+        }
+        #quiz-dialog h2 { color: bisque; font-size: 1.2rem; margin: 0 40px 16px 0; }
+        #quiz-x { position: absolute; right: 12px; top: 9px; border: 0;
+            background: transparent; color: #eee; font-size: 24px; cursor: pointer; }
+        #quiz-progress { color: #aaa; font-size: .82rem; margin-bottom: 12px; }
+        #quiz-question { font-size: 1.05rem; line-height: 1.45; margin: 0 0 16px; }
+        #quiz-options { display: grid; gap: 9px; }
+        .quiz-option { text-align: left; padding: 11px 13px; border-radius: 8px;
+            border: 1px solid #666; background: #303030; color: #fff;
+            font-size: .95rem; cursor: pointer; }
+        .quiz-option:not(:disabled):hover { border-color: #eacba1; background: #39342f; }
+        .quiz-option:disabled { cursor: default; opacity: .85; }
+        .quiz-option.correct { border-color: #7cc59a; background: #234332; opacity: 1; }
+        .quiz-option.incorrect { border-color: #da8787; background: #492a2a; }
+        #quiz-feedback { min-height: 1.3em; margin: 14px 0; line-height: 1.45; }
+        #quiz-next { display: none; align-self: flex-end; background: #58452b;
+            color: #fff1d7; border: 1px solid #aa875a; border-radius: 7px;
+            padding: 9px 17px; font-weight: bold; cursor: pointer; }
+        @media (max-width: 600px) {
+            #quiz-launch { right: 8px; bottom: 8px; padding: 5px 7px; font-size: 10px; }
+        }
+
     </style>
 </head>
 
@@ -728,6 +769,7 @@
     <div id="fixed-header">
         <h1 class="main-title">The Solar System</h1>
         <p class="main-subtitle">A Field Guide to Our Cosmic Neighbourhood<br><br>Tap to explore</p>
+        <button id="quiz-launch" type="button" aria-haspopup="dialog">QUIZ</button>
     </div>
     <div id="header-spacer"></div>
     <div id="scroll-wrapper">
@@ -887,6 +929,17 @@
         </div>
     </div>
 
+
+    <section id="quiz-dialog" role="dialog" aria-modal="true" aria-labelledby="quiz-heading" tabindex="-1">
+        <button id="quiz-x" type="button" aria-label="Close quiz">×</button>
+        <h2 id="quiz-heading">Solar System Quiz</h2>
+        <div id="quiz-progress"></div>
+        <p id="quiz-question"></p>
+        <div id="quiz-options"></div>
+        <p id="quiz-feedback" aria-live="polite"></p>
+        <button id="quiz-next" type="button">NEXT</button>
+    </section>
+
     <!-- BOOKMARK: Script  -->
     <script>
         window.addEventListener('load', function () {
@@ -1004,6 +1057,100 @@
         });
 
 
+
+
+        /* Bilingual, self-contained quiz. No network requests or stored personal data. */
+        (() => {
+            const strings = {"launch":"QUIZ","title":"Solar System Quiz","question":"Question","of":"of","score":"Score","correct":"Correct!","wrong":"Not quite.","next":"NEXT","results":"Quiz complete","again":"TRY AGAIN","close":"Close quiz"};
+            const bank = [["Which planet is closest to the Sun?",["Mercury","Venus","Earth","Mars"],0,"Mercury is the innermost planet."],["Which planet has the largest diameter?",["Saturn","Jupiter","Neptune","Earth"],1,"Jupiter is the largest planet in the Solar System."],["Which moon has lakes and seas of liquid methane and ethane?",["Europa","Titan","Io","Mimas"],1,"Titan, a moon of Saturn, has lakes and seas of hydrocarbons."],["Which planet is famous for its Great Red Spot?",["Neptune","Mars","Jupiter","Saturn"],2,"Jupiter's Great Red Spot is a long-lived atmospheric storm."],["Which moon is the most volcanically active body in the Solar System?",["Io","Europa","Triton","Ganymede"],0,"Jupiter's moon Io is extraordinarily volcanically active."],["What lies mainly between Mars and Jupiter?",["Kuiper belt","Main asteroid belt","Oort cloud","Saturn's rings"],1,"The main asteroid belt orbits between Mars and Jupiter."],["Which planet rotates on its side?",["Venus","Mercury","Uranus","Neptune"],2,"Uranus has an axial tilt of about 98 degrees."],["Which is the largest moon in the Solar System?",["Titan","Callisto","Ganymede","The Moon"],2,"Ganymede, a moon of Jupiter, is the Solar System's largest moon."],["Which planet is known for its prominent rings?",["Mars","Saturn","Venus","Mercury"],1,"Saturn's extensive ring system is especially prominent."],["Which dwarf planet is found in the main asteroid belt?",["Pluto","Eris","Ceres","Haumea"],2,"Ceres orbits within the main asteroid belt."],["Which planet has a moon called Triton?",["Neptune","Saturn","Uranus","Mars"],0,"Triton is Neptune's largest moon."],["What is an astronomical unit (AU) approximately equal to?",["Earth–Moon distance","Average Earth–Sun distance","Sun's diameter","Jupiter–Saturn distance"],1,"One AU is roughly the average distance between Earth and the Sun."],["Which planet has the hottest average surface temperature?",["Mercury","Venus","Mars","Earth"],1,"Venus is the hottest planet because of its powerful greenhouse effect."],["Which planet has two small moons named Phobos and Deimos?",["Earth","Neptune","Mars","Mercury"],2,"Phobos and Deimos orbit Mars."],["What is the Kuiper belt?",["A cloud of stars","A region beyond Neptune containing icy bodies","The ring system of Saturn","A band of solar storms"],1,"The Kuiper belt is a region of icy objects beyond Neptune."],["Which celestial body contains most of the Solar System's mass?",["Jupiter","Earth","The Sun","Saturn"],2,"The Sun contains roughly 99.9% of the Solar System's total mass."]];
+            const dialog = document.getElementById('quiz-dialog');
+            const launch = document.getElementById('quiz-launch');
+            const exit = document.getElementById('quiz-x');
+            const question = document.getElementById('quiz-question');
+            const progress = document.getElementById('quiz-progress');
+            const choices = document.getElementById('quiz-options');
+            const feedback = document.getElementById('quiz-feedback');
+            const next = document.getElementById('quiz-next');
+            const overlay = document.getElementById('overlay');
+            let round = [], at = 0, score = 0, answered = false;
+            function position() {
+                if (!window.visualViewport) return;
+                const v = window.visualViewport;
+                dialog.style.top = (v.offsetTop + v.height / 2) + 'px';
+                dialog.style.left = (v.offsetLeft + v.width / 2) + 'px';
+                dialog.style.transform = 'translate(-50%, -50%) scale(' + 1 / v.scale + ')';
+                dialog.style.transformOrigin = 'center center';
+            }
+            function showQuestion() {
+                answered = false;
+                const [q, opts] = round[at];
+                progress.textContent = strings.question + ' ' + (at + 1) + ' ' + strings.of + ' ' + round.length + ' · ' + strings.score + ': ' + score;
+                question.textContent = q;
+                feedback.textContent = '';
+                choices.replaceChildren();
+                next.style.display = 'none';
+                opts.forEach((option, index) => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'quiz-option';
+                    b.textContent = option;
+                    b.addEventListener('click', () => choose(index));
+                    choices.appendChild(b);
+                });
+            }
+            function choose(index) {
+                if (answered) return;
+                answered = true;
+                const [, , correct, explanation] = round[at];
+                if (index === correct) score++;
+                choices.querySelectorAll('button').forEach((b, i) => {
+                    b.disabled = true;
+                    if (i === correct) b.classList.add('correct');
+                    else if (i === index) b.classList.add('incorrect');
+                });
+                feedback.textContent = (index === correct ? strings.correct : strings.wrong) + ' ' + explanation;
+                progress.textContent = strings.question + ' ' + (at + 1) + ' ' + strings.of + ' ' + round.length + ' · ' + strings.score + ': ' + score;
+                next.style.display = 'block';
+                next.textContent = at === round.length - 1 ? strings.results : strings.next;
+            }
+            function start() {
+                round = [...bank].sort(() => Math.random() - .5).slice(0, 10);
+                at = 0; score = 0;
+                showQuestion();
+                dialog.style.display = 'flex';
+                overlay.style.display = 'block';
+                position();
+                dialog.focus();
+            }
+            function finish() {
+                progress.textContent = strings.results;
+                question.textContent = strings.score + ': ' + score + ' / ' + round.length;
+                choices.replaceChildren();
+                feedback.textContent = '';
+                next.textContent = strings.again;
+                next.style.display = 'block';
+            }
+            function close() {
+                dialog.style.display = 'none';
+                overlay.style.display = 'none';
+                launch.focus();
+            }
+            launch.addEventListener('click', (e) => { e.stopPropagation(); start(); });
+            dialog.addEventListener('click', e => e.stopPropagation());
+            exit.addEventListener('click', close);
+            next.addEventListener('click', () => {
+                if (at >= round.length - 1 && answered) { start(); return; }
+                at++;
+                showQuestion();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && dialog.style.display === 'flex') close();
+            });
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('scroll', () => { if (dialog.style.display === 'flex') position(); });
+                window.visualViewport.addEventListener('resize', () => { if (dialog.style.display === 'flex') position(); });
+            }
+        })();
 
     </script>
 
