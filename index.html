@@ -1072,7 +1072,7 @@
             const feedback = document.getElementById('quiz-feedback');
             const next = document.getElementById('quiz-next');
             const overlay = document.getElementById('overlay');
-            let round = [], at = 0, score = 0, answered = false;
+            let round = [], at = 0, score = 0, answered = false, completed = false;
             function position() {
                 if (!window.visualViewport) return;
                 const v = window.visualViewport;
@@ -1115,7 +1115,7 @@
             }
             function start() {
                 round = [...bank].sort(() => Math.random() - .5).slice(0, 10);
-                at = 0; score = 0;
+                at = 0; score = 0; completed = false;
                 showQuestion();
                 dialog.style.display = 'flex';
                 overlay.style.display = 'block';
@@ -1139,7 +1139,8 @@
             dialog.addEventListener('click', e => e.stopPropagation());
             exit.addEventListener('click', close);
             next.addEventListener('click', () => {
-                if (at >= round.length - 1 && answered) { start(); return; }
+                if (completed) { start(); return; }
+                if (at === round.length - 1) { completed = true; finish(); return; }
                 at++;
                 showQuestion();
             });
